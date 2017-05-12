@@ -1,0 +1,90 @@
+* {
+    /* Global values */
+    font-family: "Imagine";
+    color: #fff;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    box-sizing: border-box;
+    /* Disable font anti-aliasing for pixel type */
+    font-smooth: never;
+    -webkit-font-smoothing : none;
+}
+
+@font-face {
+  font-family: "Imagine";
+  /* Convert to woff2 later */
+  src: url('../font/imagine.ttf');
+}
+
+.game-window {
+    width: 1280px;
+    height: 720px;
+    background: rgb(45,19,61);
+    background: -moz-linear-gradient(top, rgba(45,19,61,1) 0%, rgba(11,20,38,1) 100%);
+    background: -webkit-linear-gradient(top, rgba(45,19,61,1) 0%,rgba(11,20,38,1) 100%);
+    background: linear-gradient(to bottom, rgba(45,19,61,1) 0%,rgba(11,20,38,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2d133d', endColorstr='#0b1426',GradientType=0 );
+    position: absolute;
+    /* Center the game window */
+    left: calc(50vw - 640px);
+    top: calc(50vh - 360px);
+    /* Make sure nothing can be seen outside the game window */
+    overflow:hidden;
+}
+
+.view {
+    /* Each section of the interface, hidden by default */
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+}
+
+.view.main-menu {
+    /* Show initial screen */
+    display: block;
+}
+
+h1 {
+    position: absolute;
+    /* Minimum 64px margins around entire game window for main menu */
+    top: 64px;
+    left: 64px;
+    font-size: 72px;
+}
+
+.main-menu > ul {
+    /* Remove list styling */
+    list-style-type: none;
+    padding: 0;
+    position: absolute;
+    bottom: 64px;
+    left: 64px;
+}
+
+.main-menu > ul > li {
+    width: 480px;
+    font-size: 32px;
+    padding: 12px 24px;
+}
+
+.main-menu > ul > li:hover {
+    /* Sunset gradients */
+    background: rgb(246,69,133);
+    background: -moz-linear-gradient(left, rgba(246,69,133,1) 0%, rgba(252,255,59,1) 100%);
+    background: -webkit-linear-gradient(left, rgba(246,69,133,1) 0%,rgba(252,255,59,1) 100%);
+    background: linear-gradient(to right, rgba(246,69,133,1) 0%,rgba(252,255,59,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f64585', endColorstr='#fcff3b',GradientType=1 );
+    cursor: pointer;
+}
+
+.main-menu > a.thefeeltrain {
+    /* Always sign your work */
+    position: absolute;
+    bottom: 32px;
+    right: 32px;
+    font-size: 18px;
+    text-decoration: none;
+}
