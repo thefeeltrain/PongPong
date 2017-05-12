@@ -12,22 +12,77 @@
     <div class="game-window">
 
         <!-- Menu separate from in-game view !-->
-        <div class="view main-menu">
+        <div class="view main-menu showing">
             <h1>PongPong</h1>
             <ul>
-                <li data-view="create">Create Game</li>
-                <li data-view="join">Join Game</li>
+                <li data-view="create-game">Create Game</li>
+                <li data-view="join-game">Join Game</li>
                 <li data-view="settings">Settings</li>
                 <li data-view="quit">Quit</li>
             </ul>
             <a class="thefeeltrain" target="_null" href="https://thefeeltra.in">TheFeelTrain</a>
         </div>
 
-        <div class="view create-game"></div>
-        <div class="view join-game"></div>
+        <!-- Create game screen with settings !-->
+        <div class="view create-game">
+            <h2>Create Game</h2>
+
+            <div class="settings">
+
+                <!-- Choose the number of players in a game (Default 4) !-->
+                <div class="setting" data-setting="maxplayers">
+                    <span class="label">Number of Players</span>
+                    <ul>
+                        <li data-value=2>2</li>
+                        <li data-value=3>3</li>
+                        <li data-value=4 class="selected">4</li>
+                    </ul>
+                </div>
+
+                <!-- Choose if the game shows up in the game browser (Default Public) !-->
+                <div class="setting" data-setting="visibility">
+                    <span class="label">Visibility</span>
+                    <ul>
+                        <li data-value=1 class="selected">Public</li>
+                        <li data-value=0>Private</li>
+                    </ul>
+                </div>
+
+                <!-- Enable memes !-->
+                <div class="setting" data-setting="linusmode">
+                    <span class="label">Linus Mode</span>
+                    <ul>
+                        <li data-value=1>On</li>
+                        <li data-value=0 class="selected">Off</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Back to main menu !-->
+            <span class="back" data-view="main-menu">Back</span>
+
+            <!-- Initalize game and switch to lobby view !-->
+            <span class="start" data-view="lobby">Start</span>
+
+        </div>
+
+        <!-- Join game screen with code input and game browser !-->
+        <div class="view join-game">
+            <h2>Join Game</h2>
+        </div>
+
+        <!-- Various game settings !-->
+        <div class="view settings">
+            <h2>Settings</h2>
+        </div>
+
         <div class="view lobby"></div>
+
         <div class="view tabletop"></div>
+
         <div class="view post-game"></div>
+
     </div>
 
 </body>

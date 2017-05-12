@@ -19,11 +19,6 @@
 .game-window {
     width: 1280px;
     height: 720px;
-    background: rgb(45,19,61);
-    background: -moz-linear-gradient(top, rgba(45,19,61,1) 0%, rgba(11,20,38,1) 100%);
-    background: -webkit-linear-gradient(top, rgba(45,19,61,1) 0%,rgba(11,20,38,1) 100%);
-    background: linear-gradient(to bottom, rgba(45,19,61,1) 0%,rgba(11,20,38,1) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2d133d', endColorstr='#0b1426',GradientType=0 );
     position: absolute;
     /* Center the game window */
     left: calc(50vw - 640px);
@@ -42,9 +37,25 @@
     display: none;
 }
 
-.view.main-menu {
-    /* Show initial screen */
+/* Show initial screen */
+.view.showing {
     display: block;
+}
+
+.view.main-menu {
+    background: rgb(45,19,61);
+    background: -moz-linear-gradient(top, rgba(45,19,61,1) 0%, rgba(11,20,38,1) 100%);
+    background: -webkit-linear-gradient(top, rgba(45,19,61,1) 0%,rgba(11,20,38,1) 100%);
+    background: linear-gradient(to bottom, rgba(45,19,61,1) 0%,rgba(11,20,38,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2d133d', endColorstr='#0b1426',GradientType=0 );
+}
+
+.view.create-game {
+    background: rgb(246,69,133);
+    background: -moz-linear-gradient(top, rgba(246,69,133,1) 0%, rgba(59,0,96,1) 100%);
+    background: -webkit-linear-gradient(top, rgba(246,69,133,1) 0%,rgba(59,0,96,1) 100%);
+    background: linear-gradient(to bottom, rgba(246,69,133,1) 0%,rgba(59,0,96,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f64585', endColorstr='#3b0060',GradientType=0 );
 }
 
 h1 {
@@ -52,13 +63,22 @@ h1 {
     /* Minimum 64px margins around entire game window for main menu */
     top: 64px;
     left: 64px;
-    font-size: 72px;
+    font-size: 80px;
+}
+
+h2 {
+    position: absolute;
+    /* Minimum 64px margins around entire game window for main menu */
+    top: 32px;
+    left: 64px;
+    font-size: 64px;
 }
 
 .main-menu > ul {
     /* Remove list styling */
     list-style-type: none;
     padding: 0;
+    margin: 0;
     position: absolute;
     bottom: 64px;
     left: 64px;
@@ -87,4 +107,60 @@ h1 {
     right: 32px;
     font-size: 18px;
     text-decoration: none;
+}
+
+.settings {
+    font-size: 42px;
+    position: absolute;
+    top: 200px;
+    left: 64px;
+}
+
+.setting {
+    margin-bottom: 32px;
+}
+
+.setting > ul {
+    margin: 0 0 0 48px;
+    padding: 0;
+    display: inline-block;
+    list-style-type: none;
+}
+
+.setting > ul > li {
+    transition: .2s;
+    display: inline-block;
+    margin-right: 16px;
+}
+
+.setting > ul > li.selected {
+    color: #F4BB00;
+}
+
+.setting > ul > li:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+.start, .back {
+    display: block;
+    cursor: pointer;
+    position: absolute;
+    bottom: 32px;
+    right: 64px;
+    font-size: 42px;
+    width: 200px;
+    padding: 8px;
+    text-align: right;
+    transition: 0.2s;
+}
+
+.back {
+    left: 64px;
+    text-align: left;
+}
+
+.back:hover, .start:hover {
+    background: #fff;
+    color: #000;
 }
