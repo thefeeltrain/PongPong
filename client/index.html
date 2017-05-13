@@ -92,7 +92,27 @@
             <span class="back" data-view="main-menu">Back</span>
         </div>
 
-        <div class="view lobby"></div>
+        <!-- Lobby screen !-->
+        <div class="view lobby">
+
+            <!-- Display room code !-->
+            <h2>Game Code<br><br><span class="game-code"></span></h2>
+
+            <!-- List of players in this lobby !-->
+            <ul class="player-list">
+                <li data-player=1>Waiting...</li>
+                <li data-player=2>Waiting...</li>
+                <li data-player=3>Waiting...</li>
+                <li data-player=4>Waiting...</li>
+            </ul>
+
+            <!-- Chat box !-->
+            <div class="chat-box">
+                <div class="chat-content"></div>
+            </div>
+
+            <span class="back" data-view="main-menu" data-action="leave-lobby">Leave</span>
+        </div>
 
         <div class="view tabletop"></div>
 

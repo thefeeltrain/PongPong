@@ -14,7 +14,8 @@ var server,
             maxplayers: 4,
             visibility: 1,
             linusmode: 0
-        }
+        },
+        players: {}
     },
 
     //Player object
@@ -50,9 +51,27 @@ function initialize() {
         //Parse as JSON
         let msg = JSON.parse(event.data);
 
-        //Initialize player with generated ID
         if(msg.type == "init") {
+
+            //Initialize player with generated ID
             Player.ID = msg.id;
+
+            //Show game code in lobby screen
+            $('.game-code').text(msg.id);
+
+        }
+
+        else if(msg.type == "player-joined") {
+
+            //Add connected player to the list
+            Game.players[msg.id] = {
+                name: msg.name
+            };
+
+            //Add to lobby list
+            let e = Object.keys(Game.players).length;
+            $('li[data-player='+e+']').text(msg.name);
+
         }
 
         //Add player to their own lobby
@@ -130,20 +149,7 @@ function initialize() {
 
 function loop() {
 
-    //Sync game with server when in a lobby
-    if(Player.lobby) {
-
-        let msg = {
-            //Uses the type "sync" to ask for updates
-            type: "sync",
-            id: Player.ID,
-            lobby: Player.lobby
-        };
-
-        //Send data as string instead of JSON
-        server.send(JSON.stringify(msg));
-
-    }
+    //Game sync loop
 
 }
 
@@ -157,6 +163,25 @@ function createLobby() {
     };
 
     server.send(JSON.stringify(msg));
+
+    //Set game host as yourself
+    Game.host = Player.ID;
+
+    //Create new player object in lobby
+    Game.players[Player.ID] = {
+        name: Player.name
+    };
+
+    //Hide unused elements
+    $('li[data-player]').each(function() {
+        let p = $(this).attr('data-player');
+        if(p > Game.settings.maxplayers) {
+            $(this).hide();
+        }
+    });
+
+    //Add player to list
+    $('li[data-player=1]').text(Player.name);
 
 }
 

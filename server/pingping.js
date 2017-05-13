@@ -1,5 +1,5 @@
 //Helper function to clear console
-console.reset = function () {
+console.reset = function() {
     return process.stdout.write('\033c');
 }
 
@@ -8,7 +8,7 @@ var players = {},
     lobbies = {},
     IDs = [],
     //Loop console output every second
-    looping = setInterval(loop,1000);
+    looping = setInterval(loop, 1000);
 
 //Create websocket
 var ws = require("nodejs-websocket"),
@@ -21,7 +21,7 @@ var ws = require("nodejs-websocket"),
             let data = JSON.parse(str);
 
             //Event when a player connects
-            if(data.type == "connect") {
+            if (data.type == "connect") {
                 var msg = {
                     "type": "init",
                     //Give each player a unique identifier
@@ -30,7 +30,11 @@ var ws = require("nodejs-websocket"),
 
                 //Connect name to ID and create the player object
                 players[msg.id] = {
-                    name: data.name
+                    name: data.name,
+                    //Method for sending data to the client later
+                    emit: function(j) {
+                        conn.sendText(JSON.stringify(j));
+                    }
                 };
 
                 //Remove player and their lobby if they disconnect
@@ -42,10 +46,10 @@ var ws = require("nodejs-websocket"),
             }
 
             //Main client update method
-            else if(data.type == "sync") {
+            else if (data.type == "sync") {
 
                 //Make sure the player exists and is in a lobby
-                if(IDs.includes(data.id) && data.lobby != null) {
+                if (IDs.includes(data.id) && data.lobby != null) {
 
                     var msg = {
                         "type": "sync",
@@ -65,10 +69,10 @@ var ws = require("nodejs-websocket"),
             }
 
             //When the player wants to create a lobby
-            else if(data.type == "createLobby") {
+            else if (data.type == "createLobby") {
 
                 //Make sure the player exists
-                if(IDs.includes(data.id)) {
+                if (IDs.includes(data.id)) {
 
                     //Add new lobby to the list
                     lobbies[data.id] = data.settings;
@@ -93,7 +97,7 @@ var ws = require("nodejs-websocket"),
             }
 
             //Send the generated message if it exists
-            if(msg) {
+            if (msg) {
                 conn.sendText(JSON.stringify(msg));
             }
 
@@ -110,20 +114,20 @@ function loop() {
     console.log("# of Lobbies: " + Object.keys(lobbies).length + "\n");
     console.log("List of Lobbies:");
     console.log("Host\t\tPlayers\t\tPublic");
-    for(var i=0; i < Object.keys(lobbies).length; i++) {
+    for (var i = 0; i < Object.keys(lobbies).length; i++) {
         var e = Object.keys(lobbies)[i];
-        console.log(e + "\t\t"+lobbies[e].current+"/" + lobbies[e].maxplayers + "\t\t" + lobbies[e].visibility);
+        console.log(e + "\t\t" + lobbies[e].current + "/" + lobbies[e].maxplayers + "\t\t" + lobbies[e].visibility);
     }
 }
 
 function generateUID(length = 4) {
 
     //Generate random unique indentifier
-    let uid = Math.random().toString(36).substring(2,length+2).toUpperCase();
+    let uid = Math.random().toString(36).substring(2, length + 2).toUpperCase();
 
     //Make sure it is unique, regenerate if not
-    while(IDs.includes(uid)) {
-        uid = Math.random().toString(36).substring(2,length+2).toUpperCase();
+    while (IDs.includes(uid)) {
+        uid = Math.random().toString(36).substring(2, length + 2).toUpperCase();
     }
 
     //Keep a list of all IDs
