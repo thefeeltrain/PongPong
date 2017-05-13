@@ -17,8 +17,9 @@
             <ul>
                 <li data-view="create-game">Create Game</li>
                 <li data-view="join-game">Join Game</li>
+                <li data-view="my-stats">My Stats</li>
                 <li data-view="settings">Settings</li>
-                <li data-view="quit">Quit</li>
+                <li data-action="quit">Quit</li>
             </ul>
             <a class="thefeeltrain" target="_null" href="https://thefeeltra.in">TheFeelTrain</a>
         </div>
@@ -63,18 +64,32 @@
             <span class="back" data-view="main-menu">Back</span>
 
             <!-- Initalize game and switch to lobby view !-->
-            <span class="start" data-view="lobby">Start</span>
+            <span class="start" data-view="lobby" data-action="start-lobby">Start</span>
 
+        </div>
+
+        <!-- The player's overall stats, stored in localStorage !-->
+        <div class="view my-stats">
+            <h2>My Stats</h2>
+
+            <!-- Back to main menu !-->
+            <span class="back" data-view="main-menu">Back</span>
         </div>
 
         <!-- Join game screen with code input and game browser !-->
         <div class="view join-game">
             <h2>Join Game</h2>
+
+            <!-- Back to main menu !-->
+            <span class="back" data-view="main-menu">Back</span>
         </div>
 
         <!-- Various game settings !-->
         <div class="view settings">
             <h2>Settings</h2>
+
+            <!-- Back to main menu !-->
+            <span class="back" data-view="main-menu">Back</span>
         </div>
 
         <div class="view lobby"></div>

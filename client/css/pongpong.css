@@ -64,14 +64,16 @@ h1 {
     top: 64px;
     left: 64px;
     font-size: 80px;
+    margin: 0;
 }
 
 h2 {
     position: absolute;
     /* Minimum 64px margins around entire game window for main menu */
-    top: 32px;
+    top: 64px;
     left: 64px;
     font-size: 64px;
+    margin: 0;
 }
 
 .main-menu > ul {
@@ -85,8 +87,8 @@ h2 {
 }
 
 .main-menu > ul > li {
-    width: 480px;
-    font-size: 32px;
+    width: 600px;
+    font-size: 42px;
     padding: 12px 24px;
 }
 
