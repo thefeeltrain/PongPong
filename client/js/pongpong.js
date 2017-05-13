@@ -18,6 +18,9 @@ var server,
         players: {}
     },
 
+    //Keep track of last sync
+    previous = Game,
+
     //Player object
     Player = {
         "name": localStorage.getItem('username') || "New001"
@@ -61,7 +64,26 @@ function initialize() {
 
         }
 
-        else if(msg.type == "player-joined") {
+        //When the user successfully joins a lobby
+        else if(msg.type == "lobbyJoined") {
+
+            //Set lobby as the joined lobby
+            Player.lobby = msg.lobbyID;
+
+            //Create blank objects for each player
+            for(var i=0; i < msg.players.length; i++) {
+
+                //Fix a bug that adds undefined to the player list
+                if(msg.players[i] != undefined) {
+                    Game.players[msg.players[i]] = {};
+                }
+
+            }
+
+        }
+
+        //When a new player conneccts to the lobby
+        else if(msg.type == "playerJoined") {
 
             //Add connected player to the list
             Game.players[msg.id] = {
@@ -70,7 +92,7 @@ function initialize() {
 
             //Add to lobby list
             let e = Object.keys(Game.players).length;
-            $('li[data-player='+e+']').text(msg.name);
+            $('li[data-player='+e+']').text(msg.id);
 
         }
 
@@ -80,7 +102,22 @@ function initialize() {
             console.log("Lobby created successfully.");
         }
 
+        //Sync with the server
         else if(msg.type == "sync") {
+
+            Game = msg.Game;
+
+            //If lobby has changed, sync it up
+            if(Game != previous) {
+                sync();
+                console.log("SYNC?");
+                previous = Game;
+            }
+
+        }
+
+        //Catch any data sent for testing
+        else {
             console.log(msg);
         }
 
@@ -149,8 +186,25 @@ function initialize() {
 
 function loop() {
 
-    //Game sync loop
+    //If the player is in a lobby, sync with server
+    if(Player.lobby) {
+        let msg = {
+            type: "sync",
+            id: Player.ID,
+            lobbyID: Player.lobby
+        };
+        server.send(JSON.stringify(msg));
+    }
 
+}
+
+//Updates using server data
+function sync() {
+
+    $('li[data-player=1]').text(Game.players[0]);
+    $('li[data-player=2]').text(Game.players[1] || "Waiting...");
+    $('li[data-player=3]').text(Game.players[2] || "Waiting...");
+    $('li[data-player=4]').text(Game.players[3] || "Waiting...");
 }
 
 function createLobby() {
@@ -181,7 +235,7 @@ function createLobby() {
     });
 
     //Add player to list
-    $('li[data-player=1]').text(Player.name);
+    $('li[data-player=1]').text(Player.ID);
 
 }
 

@@ -49,11 +49,11 @@ var ws = require("nodejs-websocket"),
             else if (data.type == "sync") {
 
                 //Make sure the player exists and is in a lobby
-                if (IDs.includes(data.id) && data.lobby != null) {
+                if (IDs.includes(data.id) && data.lobbyID != null) {
 
                     var msg = {
                         "type": "sync",
-                        "lobby": lobbies[data.lobby]
+                        "Game": lobbies[data.lobbyID]
                     }
 
                 }
@@ -64,6 +64,16 @@ var ws = require("nodejs-websocket"),
                         "type": "error",
                         "text": "Your ID is invalid."
                     }
+                }
+
+            }
+
+            //When the user requests a list of current servers
+            else if (data.type == "list") {
+
+                var msg = {
+                    "type": "list",
+                    "servers": lobbies
                 }
 
             }
@@ -72,29 +82,69 @@ var ws = require("nodejs-websocket"),
             else if (data.type == "createLobby") {
 
                 //Make sure the player exists
-                if (IDs.includes(data.id)) {
+                if (IDs.includes(data.id) && players[data.id].lobby == null) {
 
                     //Add new lobby to the list
                     lobbies[data.id] = data.settings;
 
+                    //Add player to their own lobby
+                    players[data.id].lobby = data.id;
+
                     //Set current player count to 1
                     lobbies[data.id].current = 1;
+
+                    //Create array of players and add host to it
+                    lobbies[data.id].players = new Array(data.id);
 
                     //Let the player know the lobby was created successfully
                     var msg = {
                         "type": "lobbyCreated"
-                    }
+                    };
 
                 }
 
-                //Let the player know that their ID is invalid
+                //Let the client know that their ID is invalid
                 else {
                     var msg = {
                         "type": "error",
                         "text": "Your ID is invalid."
-                    }
+                    };
                 }
             }
+
+            else if (data.type == "joinLobby") {
+
+                //Make sure player is not already in a lobby
+                if(players[data.id].lobby == null) {
+
+                    //Add player to lobby
+                    players[data.id].lobby == data.lobbyID;
+                    lobbies[data.lobbyID].players.push(data.id);
+                    lobbies[data.lobbyID].current++;
+
+                    //Let each player in the lobby know a new player has joined
+                    for(var i=0; i < lobbies[data.lobbyID].players.length; i++) {
+
+                        let m = {
+                            "type": "playerJoined",
+                            "players": lobbies[data.lobbyID].players
+                        };
+
+                        players[ lobbies[data.lobbyID].players[i] ].emit(m);
+                    }
+
+                    //Let the client know the join was successful
+                    var msg = {
+                        "type": "lobbyJoined",
+                        "lobbyID": data.lobbyID,
+                        //Send current player list
+                        "players": lobbies[data.lobbyID].players
+                    };
+
+                }
+
+            }
+
 
             //Send the generated message if it exists
             if (msg) {
