@@ -31,16 +31,27 @@ var ws = require("nodejs-websocket"),
                 //Connect name to ID and create the player object
                 players[msg.id] = {
                     name: data.name,
-                    //Method for sending data to the client later
-                    emit: function(j) {
-                        conn.sendText(JSON.stringify(j));
-                    }
                 };
 
-                //Remove player and their lobby if they disconnect
+                //Player disconnects
                 conn.on("close", function() {
+
+                    //If player was in a lobby
+                    if(typeof players[msg.id].lobby !== "undefined") {
+
+                        //Remove player from the lobby
+                        let l = players[msg.id].lobby;
+                        lobbies[l].players = lobbies[l].players.filter(item => item !== msg.id);
+
+                        //Lower current player count
+                        lobbies[l].current--;
+
+                    }
+
+                    //Delete player and their lobby
                     delete players[msg.id];
                     delete lobbies[msg.id];
+
                 });
 
             }
@@ -117,31 +128,53 @@ var ws = require("nodejs-websocket"),
                 //Make sure player is not already in a lobby
                 if(players[data.id].lobby == null) {
 
-                    //Add player to lobby
-                    players[data.id].lobby == data.lobbyID;
-                    lobbies[data.lobbyID].players.push(data.id);
-                    lobbies[data.lobbyID].current++;
+                    //Make sure lobby is not full
+                    if(lobbies[data.lobbyID].current < lobbies[data.lobbyID].maxplayers) {
 
-                    //Let each player in the lobby know a new player has joined
-                    for(var i=0; i < lobbies[data.lobbyID].players.length; i++) {
+                        //Add player to lobby
+                        players[data.id].lobby = data.lobbyID;
+                        lobbies[data.lobbyID].players.push(data.id);
+                        lobbies[data.lobbyID].current++;
 
-                        let m = {
-                            "type": "playerJoined",
+                        //Let the client know the join was successful
+                        var msg = {
+                            "type": "lobbyJoined",
+                            "lobbyID": data.lobbyID,
+                            //Send current player list
                             "players": lobbies[data.lobbyID].players
                         };
 
-                        players[ lobbies[data.lobbyID].players[i] ].emit(m);
                     }
 
-                    //Let the client know the join was successful
-                    var msg = {
-                        "type": "lobbyJoined",
-                        "lobbyID": data.lobbyID,
-                        //Send current player list
-                        "players": lobbies[data.lobbyID].players
-                    };
+                }
+
+            }
+
+            else if (data.type == "leaveLobby") {
+
+                let l = players[data.id].lobby;
+
+                //If lobby still exists
+                if(typeof lobbies[l] !== "undefined") {
+
+                    //Remove player from the lobby
+                    lobbies[l].players = lobbies[l].players.filter(item => item !== data.id);
+
+                    //Lower current player count
+                    lobbies[l].current--;
+
+                    //If player is the host of the lobby
+                    if(data.id == l) {
+
+                        //Completely remove that lobby
+                        delete lobbies[l];
+
+                    }
 
                 }
+
+                //Reset player's lobby
+                delete players[data.id].lobby;
 
             }
 
@@ -160,8 +193,10 @@ function loop() {
     console.reset();
     console.log("PongPong Server\n");
     console.log("# of Players: " + Object.keys(players).length);
-    console.log("List of IDs: " + IDs);
-    console.log("# of Lobbies: " + Object.keys(lobbies).length + "\n");
+    console.log("# of Lobbies: " + Object.keys(lobbies).length + "\n\n");
+
+    console.log(JSON.stringify(players) + "\n\n");
+
     console.log("List of Lobbies:");
     console.log("Host\t\tPlayers\t\tPublic");
     for (var i = 0; i < Object.keys(lobbies).length; i++) {

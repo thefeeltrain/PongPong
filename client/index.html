@@ -16,7 +16,7 @@
             <h1>PongPong</h1>
             <ul>
                 <li data-view="create-game">Create Game</li>
-                <li data-view="join-game">Join Game</li>
+                <li data-view="join-game" data-action="browse-servers">Join Game</li>
                 <li data-view="my-stats">My Stats</li>
                 <li data-view="settings">Settings</li>
                 <li data-action="quit">Quit</li>
@@ -40,7 +40,9 @@
                     </ul>
                 </div>
 
-                <!-- Choose if the game shows up in the game browser (Default Public) !-->
+                <!-- Removed due to time constraints :(
+
+                Choose if the game shows up in the game browser (Default Public)
                 <div class="setting" data-setting="visibility">
                     <span class="label">Visibility</span>
                     <ul>
@@ -48,6 +50,8 @@
                         <li data-value=0>Private</li>
                     </ul>
                 </div>
+
+                !-->
 
                 <!-- Enable memes !-->
                 <div class="setting" data-setting="linusmode">
@@ -79,6 +83,9 @@
         <!-- Join game screen with code input and game browser !-->
         <div class="view join-game">
             <h2>Join Game</h2>
+
+            <!-- List all servers !-->
+            <div class="server-browser"></div>
 
             <!-- Back to main menu !-->
             <span class="back" data-view="main-menu">Back</span>

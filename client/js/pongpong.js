@@ -80,19 +80,47 @@ function initialize() {
 
             }
 
+            //Set game code
+            $('.game-code').text(msg.lobbyID);
+
+            //Hide current menu and show lobby
+            $('.showing').removeClass('showing');
+            $('.lobby').addClass('showing');
+
         }
 
-        //When a new player conneccts to the lobby
-        else if(msg.type == "playerJoined") {
+        //Recieve server list
+        else if (msg.type == "list") {
 
-            //Add connected player to the list
-            Game.players[msg.id] = {
-                name: msg.name
-            };
+            //Clear current list of servers
+            $('.server-browser').empty();
 
-            //Add to lobby list
-            let e = Object.keys(Game.players).length;
-            $('li[data-player='+e+']').text(msg.id);
+            //Loop through each server in the list
+            for (var s in msg.servers) {
+
+                //Get server info and add element to the physical list
+                let server = msg.servers[s];
+                $('.server-browser').append('<div class="server" data-server="'+s+'"><div class="name">'+s+'</div><div class="players">'+server.current+'/'+server.maxplayers+'</div></div>')
+
+            }
+
+            //Bind hover sound effect
+            $('.server').mouseover(function() {
+                audio.hover.currentTime = 0;
+                audio.hover.play();
+            });
+
+            //Bind click
+            $('.server').click(function() {
+
+                //Join lobby from data attribute
+                joinLobby($(this).attr('data-server'));
+
+                //Play success sound
+                audio.click.currentTime = 0;
+                audio.click.play();
+
+            });
 
         }
 
@@ -105,13 +133,29 @@ function initialize() {
         //Sync with the server
         else if(msg.type == "sync") {
 
-            Game = msg.Game;
+            try {
 
-            //If lobby has changed, sync it up
-            if(Game != previous) {
-                sync();
-                console.log("SYNC?");
-                previous = Game;
+                //Get new data
+                Game = msg.Game;
+
+                //If lobby has changed, sync it up
+                if(Game != previous) {
+                    sync();
+                    previous = Game;
+                }
+
+            } catch(e) {
+
+                //Remove from lobby if connection is lost
+                leaveLobby();
+
+                //Return to main menu
+                $('.showing').removeClass('showing');
+                $('.main-menu').addClass('showing');
+
+                //Let the player know what happened
+                alert("Lost connection to server");
+
             }
 
         }
@@ -160,8 +204,14 @@ function initialize() {
 
     });
 
+    // Get list of servers
+    $('*[data-action="browse-servers"]').click(browseServers);
+
     // Create lobby on click
     $('*[data-action="start-lobby"]').click(createLobby);
+
+    // Leave lobby on click
+    $('*[data-action="leave-lobby"]').click(leaveLobby);
 
     // Bind quit to click event
     $('*[data-action="quit"]').click(quit);
@@ -205,6 +255,49 @@ function sync() {
     $('li[data-player=2]').text(Game.players[1] || "Waiting...");
     $('li[data-player=3]').text(Game.players[2] || "Waiting...");
     $('li[data-player=4]').text(Game.players[3] || "Waiting...");
+}
+
+function browseServers() {
+
+    //Ask server for list
+    server.send(JSON.stringify({type: "list"}));
+
+}
+
+function joinLobby(i) {
+
+    //Join lobby with the code 'i'
+
+    let msg = {
+        type: "joinLobby",
+        id: Player.ID,
+        lobbyID: i
+    };
+    server.send(JSON.stringify(msg));
+
+}
+
+function leaveLobby() {
+
+    let msg = {
+        type: "leaveLobby",
+        id: Player.ID,
+    };
+    server.send(JSON.stringify(msg));
+
+    //Remove player from lobby client-side
+    delete Player.lobby;
+
+    //Reset Game object to default
+    Game = {
+        settings: {
+            maxplayers: 4,
+            visibility: 1,
+            linusmode: 0
+        },
+        players: {}
+    };
+
 }
 
 function createLobby() {
