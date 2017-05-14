@@ -1,8 +1,3 @@
-//Helper function to clear console
-console.reset = function() {
-    return process.stdout.write('\033c');
-}
-
 //Initialize players and lobbies
 var players = {},
     lobbies = {},
@@ -41,7 +36,7 @@ var ws = require("nodejs-websocket"),
 
                         //Remove player from the lobby
                         let l = players[msg.id].lobby;
-                        lobbies[l].players = lobbies[l].players.filter(item => item !== msg.id);
+                        delete lobbies[l].players[msg.id];
 
                         //Lower current player count
                         lobbies[l].current--;
@@ -107,8 +102,11 @@ var ws = require("nodejs-websocket"),
                     //Set current status to in-lobby
                     lobbies[data.id].status = "lobby";
 
-                    //Create array of players and add host to it
-                    lobbies[data.id].players = new Array(data.id);
+                    //Create map of players and add host to it
+                    lobbies[data.id].players = new Object();
+                    lobbies[data.id].players[data.id] = {
+                        name: players[data.id].name
+                    };
 
                     //Let the player know the lobby was created successfully
                     var msg = {
@@ -136,7 +134,9 @@ var ws = require("nodejs-websocket"),
 
                         //Add player to lobby
                         players[data.id].lobby = data.lobbyID;
-                        lobbies[data.lobbyID].players.push(data.id);
+                        lobbies[data.lobbyID].players[data.id] = {
+                            name: players[data.id].name
+                        };
                         lobbies[data.lobbyID].current++;
 
                         //Let the client know the join was successful
@@ -161,7 +161,7 @@ var ws = require("nodejs-websocket"),
                 if(typeof lobbies[l] !== "undefined") {
 
                     //Remove player from the lobby
-                    lobbies[l].players = lobbies[l].players.filter(item => item !== data.id);
+                    delete lobbies[l].players[data.id];
 
                     //Lower current player count
                     lobbies[l].current--;
@@ -203,6 +203,9 @@ function loop() {
     console.log("PongPong Server\n");
     console.log("# of Players: " + Object.keys(players).length);
     console.log("# of Lobbies: " + Object.keys(lobbies).length + "\n");
+
+    console.log(JSON.stringify(players));
+
     console.log("List of Lobbies:");
     console.log("Host\t\tPlayers\t\tStatus");
     for (var i = 0; i < Object.keys(lobbies).length; i++) {
@@ -225,6 +228,11 @@ function generateUID(length = 4) {
     IDs.push(uid);
 
     return uid;
+}
+
+//Helper function to clear console
+console.reset = function() {
+    return process.stdout.write('\033c');
 }
 
 //Capitalize first letter of string

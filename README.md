@@ -10,7 +10,6 @@ Built for FloatPlane Club in HTML, CSS, JavaScript, and NodeJS from scratch in a
 
 - 2-4 Players per game
 - Lobbies
-- ~Usernames~
 - ~Lobby chat~ Cut due to time constraints
 - Server browser
 - Player stats

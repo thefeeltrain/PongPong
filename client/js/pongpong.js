@@ -23,8 +23,13 @@ var server,
 
     //Player object
     Player = {
-        "name": localStorage.getItem('username') || "New001",
+
+        //Ask for name on load, could be done in the UI but easier on time to do it here
+        "name": prompt("Enter your name:", "New001"),
+
+        //Set initial view to the main menu
         "view": "main-menu"
+
     },
 
     //Update at glorious 60fps
@@ -106,7 +111,7 @@ function initialize() {
 
                 //Get server info and add element to the physical list
                 let server = msg.servers[s];
-                $('.server-browser').append('<div class="server" data-server="' + s + '"><div class="name">' + s + '</div><div class="players">' + server.current + '/' + server.maxplayers + '</div></div>')
+                $('.server-browser').append('<div class="server" data-server="' + s + '"><div class="name">' + server.players[Object.keys(server.players)[0]].name + '</div><div class="players">' + server.current + '/' + server.maxplayers + '</div></div>')
 
             }
 
@@ -168,7 +173,7 @@ function initialize() {
                 Player.view = "main-menu";
 
                 //Let the player know what happened
-                alert("Lost connection to server");
+                alert(e);
 
             }
 
@@ -269,11 +274,17 @@ function sync() {
     //Before the game starts
     if(Game.status == "lobby") {
 
-        //Lobby always has at least 1 player
-        $('li[data-player=1]').text(Game.players[0]);
-        $('li[data-player=2]').text(Game.players[1] || "Waiting...");
-        $('li[data-player=3]').text(Game.players[2] || "Waiting...");
-        $('li[data-player=4]').text(Game.players[3] || "Waiting...");
+        //List players
+        for(var i=0; i < 4; i++) {
+            let keys = Object.keys(Game.players);
+
+            if(typeof keys[i] != "undefined") {
+                $('li[data-player='+(i+1)+']').text(Game.players[Object.keys(Game.players)[i]].name);
+            } else {
+                $('li[data-player='+(i+1)+']').text("Waiting...");
+            }
+
+        }
 
         //Update button text if lobby isn't full
         $('.start.host').text(Game.current == Game.maxplayers ? "Start" : "Need " + Game.maxplayers + " players to start");
