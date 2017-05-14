@@ -338,11 +338,12 @@ h2 {
 .player {
     position: absolute;
     border-radius: 2px;
+    top: 0;
+    left: 0;
 }
 
 .player.blue {
-    left: 60px;
-    top: 300px;
+    transform: translate(60px,300px);
     width: 20px;
     height: 120px;
     border: 2px solid #00ccff;
@@ -350,8 +351,7 @@ h2 {
 }
 
 .player.pink {
-    left: 300px;
-    top: 60px;
+    transform: translate(300px,60px);
     width: 120px;
     height: 20px;
     border: 2px solid #ff0091;
@@ -359,8 +359,7 @@ h2 {
 }
 
 .player.purple {
-    left: 660px;
-    top: 300px;
+    transform: translate(660px,300px);
     width: 20px;
     height: 120px;
     border: 2px solid #8c00ff;
@@ -368,8 +367,7 @@ h2 {
 }
 
 .player.orange {
-    left: 300px;
-    top: 660px;
+    transform: translate(300px,660px);
     width: 120px;
     height: 20px;
     border: 2px solid #ff8c00;
@@ -380,8 +378,8 @@ h2 {
     position: absolute;
     width: 20px;
     height: 20px;
-    left: 350px;
-    top: 350px;
+    left: 370px;
+    top: 370px;
     border: 2px solid #00d900;
     box-shadow: 0px 0px 32px 2px rgba(0,217,0,1), inset 0px 0px 32px 2px rgba(0,217,0,1);
     border-radius: 100%;

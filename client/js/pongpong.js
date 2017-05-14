@@ -375,11 +375,10 @@ function sync() {
             //padStart adds a zero to the front if score is one digit
             $('.score[data-player='+keys[i]+'] .points').text(p.score.toString().padStart(2,0));
 
-            //If coords have been updated
+            //If coords have been updated, translate to position
             if(p.x && p.y) {
                 $('.player[data-player='+keys[i]+']').css({
-                    "left": p.x+"px",
-                    "top": p.y+"px"
+                    "transform": "translate("+p.x+"px,"+p.y+"px)"
                 });
             }
 
@@ -395,7 +394,7 @@ function sync() {
             }
 
             //If key is down arrow or S
-            if(Keys[40] || Keys[83]) {
+            else if(Keys[40] || Keys[83]) {
                 move("down");
             }
 
@@ -410,7 +409,7 @@ function sync() {
             }
 
             //If key is right arrow or D
-            if(Keys[39] || Keys[68]) {
+            else if(Keys[39] || Keys[68]) {
                 move("right");
             }
 
@@ -430,6 +429,33 @@ function move(d) {
         playerID: Player.ID,
         direction: d
     }));
+
+    //Refer to player as p
+    var p = Game.players[Player.ID],
+    //Amount moved per tick
+        a = 4;
+
+    //Client side movement to help reduce visual lag
+    switch(d) {
+        case "up":
+            p.y-= a;
+            break;
+        case "down":
+            p.y+= a;
+            break;
+        case "left":
+            p.x-= a;
+            break;
+        case "right":
+            p.x+= a;
+            break;
+    }
+
+    //Actually move the element, more efficient with a translate
+    //Position gets overridden later by sync
+    $('.player[data-player='+Player.ID+']').css({
+        "transform": "translate("+p.x+"px,"+p.y+"px)"
+    });
 
 }
 
