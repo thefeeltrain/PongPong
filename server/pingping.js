@@ -188,7 +188,6 @@ var ws = require("nodejs-websocket"),
 
             }
 
-
             //Send the generated message if it exists
             if (msg) {
                 conn.sendText(JSON.stringify(msg));

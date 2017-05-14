@@ -259,3 +259,30 @@ h2 {
     background: #fff;
     color: #000;
 }
+
+.scoreboard {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 720px;
+    background: #000;
+}
+
+.scoreboard.right {
+    left: auto;
+    right: 0;
+}
+
+.play {
+    position: absolute;
+    top: 0;
+    left: 280px;
+    width: 720px;
+    height: 720px;
+    background: rgb(11,15,61);
+    background: -moz-radial-gradient(center, ellipse cover, rgba(11,15,61,1) 0%, rgba(14,8,15,1) 100%);
+    background: -webkit-radial-gradient(center, ellipse cover, rgba(11,15,61,1) 0%,rgba(14,8,15,1) 100%);
+    background: radial-gradient(ellipse at center, rgba(11,15,61,1) 0%,rgba(14,8,15,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0b0f3d', endColorstr='#0e080f',GradientType=1 );
+}
