@@ -359,7 +359,7 @@ h2 {
 }
 
 .player.purple {
-    right: 60px;
+    left: 660px;
     top: 300px;
     width: 20px;
     height: 120px;
@@ -369,7 +369,7 @@ h2 {
 
 .player.orange {
     left: 300px;
-    bottom: 60px;
+    top: 660px;
     width: 120px;
     height: 20px;
     border: 2px solid #ff8c00;

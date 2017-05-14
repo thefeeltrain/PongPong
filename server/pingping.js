@@ -125,6 +125,75 @@ var ws = require("nodejs-websocket"),
                 }
             }
 
+            //Move a player in-game
+            else if(data.type == "move") {
+
+                //Lobby is l, player is p
+                var l = lobbies[data.lobbyID],
+                    p = l.players[data.playerID],
+                    keys = Object.keys(l.players);
+
+                //If X coord has not been set yet
+                if(typeof p.x == "undefined") {
+
+                    //If player 1 set X coord to 60
+                    if(data.playerID == keys[0]) {
+                        p.x = 60;
+                    }
+
+                    //If player 2 set X coord to 660
+                    if(data.playerID == keys[1]) {
+                        p.x = 660;
+                    }
+
+                    //If player 3 or 4 set X coord to 300
+                    if(data.playerID == keys[2] || data.playerID == keys[3]) {
+                        p.x = 300;
+                    }
+
+                }
+
+                //If Y coord has not been set yet
+                if(typeof p.y == "undefined") {
+
+                    //If player 1 or 2 set Y coord to 300
+                    if(data.playerID == keys[0] || data.playerID == keys[1]) {
+                        p.y = 300;
+                    }
+
+                    //If player 3 set Y coord to 60
+                    if(data.playerID == keys[2]) {
+                        p.y = 60;
+                    }
+
+                    //If player 4 set Y coord to 660
+                    if(data.playerID == keys[3]) {
+                        p.y = 660;
+                    }
+
+                }
+
+                //Amount moved per tick
+                let a = 4;
+
+                //Actually update the coordinate value
+                switch(data.direction) {
+                    case "up":
+                        p.y-= a;
+                        break;
+                    case "down":
+                        p.y+= a;
+                        break;
+                    case "left":
+                        p.x-= a;
+                        break;
+                    case "right":
+                        p.x+= a;
+                        break;
+                }
+
+            }
+
             else if (data.type == "joinLobby") {
 
                 //Make sure player is not already in a lobby

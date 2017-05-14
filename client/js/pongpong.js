@@ -36,10 +36,17 @@ var server,
 
     },
 
+    //List of keys that are pressed
+    Keys = {},
+
     //Update at glorious 60fps
     GameLoop = setInterval(loop, 1000 / 60);
 
 function initialize() {
+
+    //Detect if key is being pressed
+    window.onkeyup = function(e) {Keys[e.keyCode]=false;}
+    window.onkeydown = function(e) {Keys[e.keyCode]=true;}
 
     //Connect to server, temp use localhost
     server = new WebSocket("ws://localhost:8082");
@@ -362,17 +369,67 @@ function sync() {
             //Refer to player object as p from now on
             let p = Game.players[keys[i]];
 
-
-
             //Update scoreboxes
             $('.score[data-player='+keys[i]+'] .name').text(p.name);
 
             //padStart adds a zero to the front if score is one digit
             $('.score[data-player='+keys[i]+'] .points').text(p.score.toString().padStart(2,0));
 
+            //If coords have been updated
+            if(p.x && p.y) {
+                $('.player[data-player='+keys[i]+']').css({
+                    "left": p.x+"px",
+                    "top": p.y+"px"
+                });
+            }
+
+        }
+
+        //Bind keys to move functions
+        //Only bind vertical if player 1 or 2
+        if(Player.ID == keys[0] || Player.ID == keys[1]) {
+
+            //If key is up arrow or W
+            if(Keys[38] || Keys[87]) {
+                move("up");
+            }
+
+            //If key is down arrow or S
+            if(Keys[40] || Keys[83]) {
+                move("down");
+            }
+
+        }
+
+        //Only bind horizontal if player 3 or 4
+        if(Player.ID == keys[2] || Player.ID == keys[3]) {
+
+            //If key is left arrow or A
+            if(Keys[37] || Keys[65]) {
+                move("left");
+            }
+
+            //If key is right arrow or D
+            if(Keys[39] || Keys[68]) {
+                move("right");
+            }
+
         }
 
     }
+
+}
+
+function move(d) {
+
+    //Player movement
+    //Will have lag when implemented this way but that's not the point
+    server.send(JSON.stringify({
+        type: "move",
+        lobbyID: Player.lobby,
+        playerID: Player.ID,
+        direction: d
+    }));
 
 }
 
