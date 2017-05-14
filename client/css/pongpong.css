@@ -178,7 +178,7 @@ h2 {
     color: #fff;
 }
 
-.name, .players {
+.server .name, .server .players {
     transition: .2s;
     width: 558px;
     font-size: 42px;
@@ -274,6 +274,54 @@ h2 {
     right: 0;
 }
 
+.score {
+    width: 240px;
+    position: absolute;
+    left: 20px;
+    font-size: 42px;
+    text-align: center;
+}
+
+.score.top {
+    top: 20px;
+}
+
+.score.bottom {
+    bottom: 20px;
+}
+
+.score.two-players {
+    top: 300px;
+    bottom: auto;
+}
+
+.score .points {
+    margin-top: 24px;
+    display: block;
+    font-size: 80px;
+    text-align: center;
+}
+
+.score.blue .name, .score.blue .points {
+    color: #00ccff;
+    text-shadow: 0px 0px 24px rgba(0,204,255,1);
+}
+
+.score.pink .name, .score.pink .points {
+    color: #ff0091;
+    text-shadow: 0px 0px 24px rgba(255,0,145,1);
+}
+
+.score.purple .name, .score.purple .points {
+    color: #8c00ff;
+    text-shadow: 0px 0px 24px rgba(140,0,255,1);
+}
+
+.score.orange .name, .score.orange .points {
+    color: #ff8c00;
+    text-shadow: 0px 0px 24px rgba(255,140,0,1);
+}
+
 .play {
     position: absolute;
     top: 0;
@@ -286,3 +334,67 @@ h2 {
     background: radial-gradient(ellipse at center, rgba(11,15,61,1) 0%,rgba(14,8,15,1) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0b0f3d', endColorstr='#0e080f',GradientType=1 );
 }
+
+.player {
+    position: absolute;
+    border-radius: 2px;
+}
+
+.player.blue {
+    left: 60px;
+    top: 300px;
+    width: 20px;
+    height: 120px;
+    border: 2px solid #00ccff;
+    box-shadow: 0px 0px 32px 2px rgba(0,204,255,1), inset 0px 0px 32px 2px rgba(0,204,255,1);
+}
+
+.player.pink {
+    left: 300px;
+    top: 60px;
+    width: 120px;
+    height: 20px;
+    border: 2px solid #ff0091;
+    box-shadow: 0px 0px 32px 2px rgba(255,0,145,1), inset 0px 0px 32px 2px rgba(255,0,145,1);
+}
+
+.player.purple {
+    right: 60px;
+    top: 300px;
+    width: 20px;
+    height: 120px;
+    border: 2px solid #8c00ff;
+    box-shadow: 0px 0px 32px 2px rgba(140,0,255,1), inset 0px 0px 32px 2px rgba(140,0,255,1);
+}
+
+.player.orange {
+    left: 300px;
+    bottom: 60px;
+    width: 120px;
+    height: 20px;
+    border: 2px solid #ff8c00;
+    box-shadow: 0px 0px 32px 2px rgba(255,140,0,1), inset 0px 0px 32px 2px rgba(255,140,0,1);
+}
+
+.ball {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 350px;
+    top: 350px;
+    border: 2px solid #00d900;
+    box-shadow: 0px 0px 32px 2px rgba(0,217,0,1), inset 0px 0px 32px 2px rgba(0,217,0,1);
+    border-radius: 100%;
+}
+
+.corner {
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    background: #000;
+}
+
+.corner.top {top: 0;}
+.corner.bottom {bottom: 0;}
+.corner.left {left: 0;}
+.corner.right {right: 0;}

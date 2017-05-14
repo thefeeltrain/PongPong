@@ -13,7 +13,8 @@ var server,
         settings: {
             maxplayers: 4,
             visibility: 1,
-            linusmode: 0
+            linusmode: 0,
+            scoretowin: 10
         },
         players: {}
     },
@@ -25,10 +26,13 @@ var server,
     Player = {
 
         //Ask for name on load, could be done in the UI but easier on time to do it here
-        "name": prompt("Enter your name:", "New001"),
+        "name": prompt("Enter your name (Max 8 characters)", "New001").substr(0,8),
 
         //Set initial view to the main menu
-        "view": "main-menu"
+        "view": "main-menu",
+
+        //If the player has started the game
+        "started": false
 
     },
 
@@ -173,7 +177,7 @@ function initialize() {
                 Player.view = "main-menu";
 
                 //Let the player know what happened
-                alert(e);
+                alert("Lost connection to host.");
 
             }
 
@@ -295,13 +299,77 @@ function sync() {
     }
 
     //During the game
-    else if(Game.status == "playing") {
+    if(Game.status == "playing") {
+
+        var keys = Object.keys(Game.players);
 
         //Make sure player is on the game screen
         if(Player.view != "tabletop") {
             $('.showing').removeClass('showing');
             $('.tabletop').addClass('showing');
             Player.view = "tabletop";
+        }
+
+        //Runs the first loop
+        if(!Player.started) {
+
+            Player.started = true;
+
+            //Reset player rectangles
+            $('.player').removeClass('two-players').show();
+
+            if(Game.maxplayers == "2") {
+
+                //Link players to their respective rectangle and scorebox
+                $('.player.blue, .score.blue').attr('data-player',keys[0]);
+                $('.player.purple, .score.purple').attr('data-player',keys[1]);
+
+                //Move scoreboxes to center if there are two players
+                $('.score.blue, .score.purple').addClass('two-players');
+
+                //Hide unused elements
+                $('.player.pink, .score.pink').hide();
+                $('.player.orange, .score.orange').hide();
+            }
+
+            else if(Game.maxplayers == "3") {
+
+                //Link players to their respective rectangle and scorebox
+                $('.player.blue, .score.blue').attr('data-player',keys[0]);
+                $('.player.purple, .score.purple').attr('data-player',keys[1]);
+                $('.player.pink, .score.pink').attr('data-player',keys[2]);
+
+                //Hide unused elements
+                $('.player.orange, .score.orange').hide();
+
+            }
+
+            else {
+
+                //Link players to their respective rectangle and scorebox
+                $('.player.blue, .score.blue').attr('data-player',keys[0]);
+                $('.player.purple, .score.purple').attr('data-player',keys[1]);
+                $('.player.pink, .score.pink').attr('data-player',keys[2]);
+                $('.player.orange, .score.orange').attr('data-player',keys[3]);
+
+            }
+
+        }
+
+        //Done for each player in the game
+        for(var i=0; i < keys.length; i++) {
+
+            //Refer to player object as p from now on
+            let p = Game.players[keys[i]];
+
+
+
+            //Update scoreboxes
+            $('.score[data-player='+keys[i]+'] .name').text(p.name);
+
+            //padStart adds a zero to the front if score is one digit
+            $('.score[data-player='+keys[i]+'] .points').text(p.score.toString().padStart(2,0));
+
         }
 
     }

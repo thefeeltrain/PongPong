@@ -105,7 +105,8 @@ var ws = require("nodejs-websocket"),
                     //Create map of players and add host to it
                     lobbies[data.id].players = new Object();
                     lobbies[data.id].players[data.id] = {
-                        name: players[data.id].name
+                        name: players[data.id].name,
+                        score: 0
                     };
 
                     //Let the player know the lobby was created successfully
@@ -135,7 +136,8 @@ var ws = require("nodejs-websocket"),
                         //Add player to lobby
                         players[data.id].lobby = data.lobbyID;
                         lobbies[data.lobbyID].players[data.id] = {
-                            name: players[data.id].name
+                            name: players[data.id].name,
+                            score: 0
                         };
                         lobbies[data.lobbyID].current++;
 
