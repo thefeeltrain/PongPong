@@ -23,11 +23,12 @@ var server,
 
     //Player object
     Player = {
-        "name": localStorage.getItem('username') || "New001"
+        "name": localStorage.getItem('username') || "New001",
+        "view": "main-menu"
     },
 
     //Update at glorious 60fps
-    GameLoop = setInterval(loop,1000/60);
+    GameLoop = setInterval(loop, 1000 / 60);
 
 function initialize() {
 
@@ -40,7 +41,7 @@ function initialize() {
     }
 
     //Initialize the connection to the server
-    server.onopen = function (event) {
+    server.onopen = function(event) {
         let msg = {
             type: "connect",
             name: Player.name
@@ -49,12 +50,12 @@ function initialize() {
     };
 
     //Recieve data from server
-    server.onmessage = function (event) {
+    server.onmessage = function(event) {
 
         //Parse as JSON
         let msg = JSON.parse(event.data);
 
-        if(msg.type == "init") {
+        if (msg.type == "init") {
 
             //Initialize player with generated ID
             Player.ID = msg.id;
@@ -65,27 +66,32 @@ function initialize() {
         }
 
         //When the user successfully joins a lobby
-        else if(msg.type == "lobbyJoined") {
+        else if (msg.type == "lobbyJoined") {
 
             //Set lobby as the joined lobby
             Player.lobby = msg.lobbyID;
 
-            //Create blank objects for each player
-            for(var i=0; i < msg.players.length; i++) {
+            //Reset hidden elements
+            $('li[data-player]').show();
 
-                //Fix a bug that adds undefined to the player list
-                if(msg.players[i] != undefined) {
-                    Game.players[msg.players[i]] = {};
+            //Hide unused elements
+            $('li[data-player]').each(function() {
+                let p = $(this).attr('data-player');
+                if (p > msg.Game.maxplayers) {
+                    $(this).hide();
                 }
-
-            }
+            });
 
             //Set game code
             $('.game-code').text(msg.lobbyID);
 
+            //Remove start button, host only
+            $('.start.host').remove();
+
             //Hide current menu and show lobby
             $('.showing').removeClass('showing');
             $('.lobby').addClass('showing');
+            Player.view = "lobby";
 
         }
 
@@ -100,7 +106,7 @@ function initialize() {
 
                 //Get server info and add element to the physical list
                 let server = msg.servers[s];
-                $('.server-browser').append('<div class="server" data-server="'+s+'"><div class="name">'+s+'</div><div class="players">'+server.current+'/'+server.maxplayers+'</div></div>')
+                $('.server-browser').append('<div class="server" data-server="' + s + '"><div class="name">' + s + '</div><div class="players">' + server.current + '/' + server.maxplayers + '</div></div>')
 
             }
 
@@ -125,13 +131,20 @@ function initialize() {
         }
 
         //Add player to their own lobby
-        else if(msg.type == "lobbyCreated") {
+        else if (msg.type == "lobbyCreated") {
+
             Player.lobby = Player.ID;
-            console.log("Lobby created successfully.");
+
+            //Update game code
+            $('.game-code').text(Player.ID);
+
+            //Add start button for host
+            $('<span class="start host gray">Start</span>').click(startGame).appendTo('.view.lobby');
+
         }
 
         //Sync with the server
-        else if(msg.type == "sync") {
+        else if (msg.type == "sync") {
 
             try {
 
@@ -139,12 +152,12 @@ function initialize() {
                 Game = msg.Game;
 
                 //If lobby has changed, sync it up
-                if(Game != previous) {
+                if (!Object.is(Game, previous)) {
                     sync();
                     previous = Game;
                 }
 
-            } catch(e) {
+            } catch (e) {
 
                 //Remove from lobby if connection is lost
                 leaveLobby();
@@ -152,6 +165,7 @@ function initialize() {
                 //Return to main menu
                 $('.showing').removeClass('showing');
                 $('.main-menu').addClass('showing');
+                Player.view = "main-menu";
 
                 //Let the player know what happened
                 alert("Lost connection to server");
@@ -200,7 +214,8 @@ function initialize() {
 
         // Hide current view, show new view
         $('.showing').removeClass('showing');
-        $('.'+to).addClass('showing');
+        $('.' + to).addClass('showing');
+        Player.view = to;
 
     });
 
@@ -237,7 +252,7 @@ function initialize() {
 function loop() {
 
     //If the player is in a lobby, sync with server
-    if(Player.lobby) {
+    if (Player.lobby) {
         let msg = {
             type: "sync",
             id: Player.ID,
@@ -251,16 +266,43 @@ function loop() {
 //Updates using server data
 function sync() {
 
-    $('li[data-player=1]').text(Game.players[0]);
-    $('li[data-player=2]').text(Game.players[1] || "Waiting...");
-    $('li[data-player=3]').text(Game.players[2] || "Waiting...");
-    $('li[data-player=4]').text(Game.players[3] || "Waiting...");
+    //Before the game starts
+    if(Game.status == "lobby") {
+
+        //Lobby always has at least 1 player
+        $('li[data-player=1]').text(Game.players[0]);
+        $('li[data-player=2]').text(Game.players[1] || "Waiting...");
+        $('li[data-player=3]').text(Game.players[2] || "Waiting...");
+        $('li[data-player=4]').text(Game.players[3] || "Waiting...");
+
+        //Update button text if lobby isn't full
+        $('.start.host').text(Game.current == Game.maxplayers ? "Start" : "Need " + Game.maxplayers + " players to start");
+
+        //Player count in the top right
+        $('.player-count').text(Game.current + "/" + Game.maxplayers);
+
+    }
+
+    //During the game
+    else if(Game.status == "playing") {
+
+        //Make sure player is on the game screen
+        if(Player.view != "tabletop") {
+            $('.showing').removeClass('showing');
+            $('.tabletop').addClass('showing');
+            Player.view = "tabletop";
+        }
+
+    }
+
 }
 
 function browseServers() {
 
     //Ask server for list
-    server.send(JSON.stringify({type: "list"}));
+    server.send(JSON.stringify({
+        type: "list"
+    }));
 
 }
 
@@ -319,16 +361,38 @@ function createLobby() {
         name: Player.name
     };
 
+
+    //Reset hidden elements
+    $('li[data-player]').show();
+
     //Hide unused elements
     $('li[data-player]').each(function() {
         let p = $(this).attr('data-player');
-        if(p > Game.settings.maxplayers) {
+        if (p > Game.settings.maxplayers) {
             $(this).hide();
         }
     });
 
     //Add player to list
     $('li[data-player=1]').text(Player.ID);
+
+}
+
+function startGame() {
+
+    //Only start if all players are present
+    if(Game.current == Game.maxplayers) {
+
+        let msg = {
+            type: "startGame",
+            //Use host's ID as lobbyID
+            //Could be done better
+            lobbyID: Player.ID,
+        };
+
+        server.send(JSON.stringify(msg));
+
+    }
 
 }
 

@@ -104,6 +104,9 @@ var ws = require("nodejs-websocket"),
                     //Set current player count to 1
                     lobbies[data.id].current = 1;
 
+                    //Set current status to in-lobby
+                    lobbies[data.id].status = "lobby";
+
                     //Create array of players and add host to it
                     lobbies[data.id].players = new Array(data.id);
 
@@ -140,8 +143,8 @@ var ws = require("nodejs-websocket"),
                         var msg = {
                             "type": "lobbyJoined",
                             "lobbyID": data.lobbyID,
-                            //Send current player list
-                            "players": lobbies[data.lobbyID].players
+                            //Send current lobby
+                            "Game": lobbies[data.lobbyID]
                         };
 
                     }
@@ -178,6 +181,13 @@ var ws = require("nodejs-websocket"),
 
             }
 
+            else if (data.type == "startGame") {
+
+                //Mark the game as in progress
+                lobbies[data.lobbyID].status = "playing";
+
+            }
+
 
             //Send the generated message if it exists
             if (msg) {
@@ -193,15 +203,12 @@ function loop() {
     console.reset();
     console.log("PongPong Server\n");
     console.log("# of Players: " + Object.keys(players).length);
-    console.log("# of Lobbies: " + Object.keys(lobbies).length + "\n\n");
-
-    console.log(JSON.stringify(players) + "\n\n");
-
+    console.log("# of Lobbies: " + Object.keys(lobbies).length + "\n");
     console.log("List of Lobbies:");
-    console.log("Host\t\tPlayers\t\tPublic");
+    console.log("Host\t\tPlayers\t\tStatus");
     for (var i = 0; i < Object.keys(lobbies).length; i++) {
         var e = Object.keys(lobbies)[i];
-        console.log(e + "\t\t" + lobbies[e].current + "/" + lobbies[e].maxplayers + "\t\t" + lobbies[e].visibility);
+        console.log(e + "\t\t" + lobbies[e].current + "/" + lobbies[e].maxplayers + "\t\t" + lobbies[e].status.capitalize());
     }
 }
 
@@ -219,4 +226,9 @@ function generateUID(length = 4) {
     IDs.push(uid);
 
     return uid;
+}
+
+//Capitalize first letter of string
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
 }

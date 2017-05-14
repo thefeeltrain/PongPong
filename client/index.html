@@ -1,4 +1,5 @@
 <!doctype HTML>
+
 <head>
     <title>PongPong</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,6 +8,7 @@
     <script src="js/jquery.min.js"></script>
     <script src="js/pongpong.js"></script>
 </head>
+
 <body>
     <!-- One main window to rule them all !-->
     <div class="game-window">
@@ -105,6 +107,9 @@
             <!-- Display room code !-->
             <h2>Game Code<br><br><span class="game-code"></span></h2>
 
+            <!-- Show current number of players !-->
+            <span class="player-count"></span>
+
             <!-- List of players in this lobby !-->
             <ul class="player-list">
                 <li data-player=1>Waiting...</li>
@@ -118,6 +123,7 @@
                 <div class="chat-content"></div>
             </div>
 
+            <!-- Back to main menu !-->
             <span class="back" data-view="main-menu" data-action="leave-lobby">Leave</span>
         </div>
 

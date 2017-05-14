@@ -143,6 +143,14 @@ h2 {
     margin: 0 0 8px;
 }
 
+.player-count {
+    position: absolute;
+    top: 64px;
+    right: 64px;
+    font-size: 64px;
+    margin: 0;
+}
+
 .server-browser {
     position: absolute;
     top: 200px;
@@ -236,6 +244,10 @@ h2 {
     padding: 8px;
     text-align: right;
     transition: 0.2s;
+}
+
+.start.host {
+    width: auto;
 }
 
 .back {
