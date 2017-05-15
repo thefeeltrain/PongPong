@@ -102,11 +102,25 @@ var ws = require("nodejs-websocket"),
                     //Set current status to in-lobby
                     lobbies[data.id].status = "lobby";
 
+                    //Used to check for host client-side
+                    lobbies[data.id].host = data.id;
+
                     //Create map of players and add host to it
                     lobbies[data.id].players = new Object();
                     lobbies[data.id].players[data.id] = {
                         name: players[data.id].name,
                         score: 0
+                    };
+
+                    //Initialize ball object
+                    lobbies[data.id].ball = {
+                        //Coordinates
+                        x: 350,
+                        y: 350,
+                        //Speeds
+                        sx: 0,
+                        sy: 0,
+                        last: "green"
                     };
 
                     //Let the player know the lobby was created successfully
@@ -141,9 +155,9 @@ var ws = require("nodejs-websocket"),
                         p.x = 60;
                     }
 
-                    //If player 2 set X coord to 660
+                    //If player 2 set X coord to 640
                     if(data.playerID == keys[1]) {
-                        p.x = 660;
+                        p.x = 640;
                     }
 
                     //If player 3 or 4 set X coord to 300
@@ -166,9 +180,9 @@ var ws = require("nodejs-websocket"),
                         p.y = 60;
                     }
 
-                    //If player 4 set Y coord to 660
+                    //If player 4 set Y coord to 640
                     if(data.playerID == keys[3]) {
-                        p.y = 660;
+                        p.y = 640;
                     }
 
                 }
@@ -191,6 +205,31 @@ var ws = require("nodejs-websocket"),
                         p.x+= a;
                         break;
                 }
+
+                //Prevent vertical players from going out of bounds
+                if(data.playerID == keys[0] || data.playerID == keys[1]) {
+                    p.y = p.y.clamp(80,520);
+                }
+
+                //Prevent horizontal players from going out of bounds
+                if(data.playerID == keys[2] || data.playerID == keys[3]) {
+                    p.x = p.x.clamp(80,520);
+                }
+
+
+            }
+
+            else if(data.type == "updateBall") {
+
+                //Serve ball from host
+                lobbies[data.lobbyID].ball = data.ball;
+
+            }
+
+            else if(data.type == "score") {
+
+                //Add one point to player's score
+                lobbies[data.lobbyID].players[data.playerID].score++;
 
             }
 
@@ -310,3 +349,8 @@ console.reset = function() {
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
 }
+
+//Keep a number within a specified range
+Number.prototype.clamp = function(min, max) {
+  return Math.min(Math.max(this, min), max);
+};

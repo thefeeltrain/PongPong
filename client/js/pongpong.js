@@ -4,7 +4,12 @@ var server,
     audio = {
         synth: new Audio("audio/synth.mp3"),
         hover: new Audio("audio/ui-hover.wav"),
-        click: new Audio("audio/ui-click.wav")
+        click: new Audio("audio/ui-click.wav"),
+        blue: new Audio("audio/blue.wav"),
+        pink: new Audio("audio/pink.wav"),
+        purple: new Audio("audio/purple.wav"),
+        orange: new Audio("audio/orange.wav"),
+        green: new Audio("audio/green.wav")
     },
 
     //Game object
@@ -26,7 +31,7 @@ var server,
     Player = {
 
         //Ask for name on load, could be done in the UI but easier on time to do it here
-        "name": prompt("Enter your name (Max 8 characters)", "New001").substr(0,8),
+        "name": prompt("Enter your name (Max 8 characters)", "New001").substr(0, 8),
 
         //Set initial view to the main menu
         "view": "main-menu",
@@ -45,8 +50,12 @@ var server,
 function initialize() {
 
     //Detect if key is being pressed
-    window.onkeyup = function(e) {Keys[e.keyCode]=false;}
-    window.onkeydown = function(e) {Keys[e.keyCode]=true;}
+    window.onkeyup = function(e) {
+        Keys[e.keyCode] = false;
+    }
+    window.onkeydown = function(e) {
+        Keys[e.keyCode] = true;
+    }
 
     //Connect to server, temp use localhost
     server = new WebSocket("ws://localhost:8082");
@@ -185,7 +194,7 @@ function initialize() {
 
                 //Let the player know what happened
                 alert("Lost connection to host.");
-
+                console.log(e);
             }
 
         }
@@ -221,6 +230,13 @@ function initialize() {
         audio.click.play();
 
     });
+
+    //Color volumes
+    audio.blue.volume = 0.25;
+    audio.pink.volume = 0.25;
+    audio.purple.volume = 0.25;
+    audio.orange.volume = 0.25;
+    audio.green.volume = 0.25;
 
     // Bind main menu view swaps
     $('*[data-view]').click(function() {
@@ -283,22 +299,26 @@ function loop() {
 function sync() {
 
     //Before the game starts
-    if(Game.status == "lobby") {
+    if (Game.status == "lobby") {
+
+        var keys = Object.keys(Game.players);
 
         //List players
-        for(var i=0; i < 4; i++) {
-            let keys = Object.keys(Game.players);
+        for (var i = 0; i < 4; i++) {
 
-            if(typeof keys[i] != "undefined") {
-                $('li[data-player='+(i+1)+']').text(Game.players[Object.keys(Game.players)[i]].name);
+            if (typeof keys[i] != "undefined") {
+                $('li[data-player=' + (i + 1) + ']').text(Game.players[Object.keys(Game.players)[i]].name);
             } else {
-                $('li[data-player='+(i+1)+']').text("Waiting...");
+                $('li[data-player=' + (i + 1) + ']').text("Waiting...");
             }
 
         }
 
         //Update button text if lobby isn't full
-        $('.start.host').text(Game.current == Game.maxplayers ? "Start" : "Need " + Game.maxplayers + " players to start");
+        $('.start.host').text(Game.current == Game.maxplayers ? "Start" : "Need " + Game.maxplayers + " players to start").mouseover(function() {
+            audio.hover.currentTime = 0;
+            audio.hover.play();
+        });
 
         //Player count in the top right
         $('.player-count').text(Game.current + "/" + Game.maxplayers);
@@ -306,30 +326,30 @@ function sync() {
     }
 
     //During the game
-    if(Game.status == "playing") {
+    if (Game.status == "playing") {
 
         var keys = Object.keys(Game.players);
 
         //Make sure player is on the game screen
-        if(Player.view != "tabletop") {
+        if (Player.view != "tabletop") {
             $('.showing').removeClass('showing');
             $('.tabletop').addClass('showing');
             Player.view = "tabletop";
         }
 
         //Runs the first loop
-        if(!Player.started) {
+        if (!Player.started) {
 
             Player.started = true;
 
             //Reset player rectangles
             $('.player').removeClass('two-players').show();
 
-            if(Game.maxplayers == "2") {
+            if (Game.maxplayers == "2") {
 
                 //Link players to their respective rectangle and scorebox
-                $('.player.blue, .score.blue').attr('data-player',keys[0]);
-                $('.player.purple, .score.purple').attr('data-player',keys[1]);
+                $('.player.blue, .score.blue').attr('data-player', keys[0]);
+                $('.player.purple, .score.purple').attr('data-player', keys[1]);
 
                 //Move scoreboxes to center if there are two players
                 $('.score.blue, .score.purple').addClass('two-players');
@@ -337,48 +357,44 @@ function sync() {
                 //Hide unused elements
                 $('.player.pink, .score.pink').hide();
                 $('.player.orange, .score.orange').hide();
-            }
-
-            else if(Game.maxplayers == "3") {
+            } else if (Game.maxplayers == "3") {
 
                 //Link players to their respective rectangle and scorebox
-                $('.player.blue, .score.blue').attr('data-player',keys[0]);
-                $('.player.purple, .score.purple').attr('data-player',keys[1]);
-                $('.player.pink, .score.pink').attr('data-player',keys[2]);
+                $('.player.blue, .score.blue').attr('data-player', keys[0]);
+                $('.player.purple, .score.purple').attr('data-player', keys[1]);
+                $('.player.pink, .score.pink').attr('data-player', keys[2]);
 
                 //Hide unused elements
                 $('.player.orange, .score.orange').hide();
 
-            }
-
-            else {
+            } else {
 
                 //Link players to their respective rectangle and scorebox
-                $('.player.blue, .score.blue').attr('data-player',keys[0]);
-                $('.player.purple, .score.purple').attr('data-player',keys[1]);
-                $('.player.pink, .score.pink').attr('data-player',keys[2]);
-                $('.player.orange, .score.orange').attr('data-player',keys[3]);
+                $('.player.blue, .score.blue').attr('data-player', keys[0]);
+                $('.player.purple, .score.purple').attr('data-player', keys[1]);
+                $('.player.pink, .score.pink').attr('data-player', keys[2]);
+                $('.player.orange, .score.orange').attr('data-player', keys[3]);
 
             }
 
         }
 
         //Done for each player in the game
-        for(var i=0; i < keys.length; i++) {
+        for (var i = 0; i < keys.length; i++) {
 
             //Refer to player object as p from now on
             let p = Game.players[keys[i]];
 
             //Update scoreboxes
-            $('.score[data-player='+keys[i]+'] .name').text(p.name);
+            $('.score[data-player=' + keys[i] + '] .name').text(p.name);
 
             //padStart adds a zero to the front if score is one digit
-            $('.score[data-player='+keys[i]+'] .points').text(p.score.toString().padStart(2,0));
+            $('.score[data-player=' + keys[i] + '] .points').text(p.score.toString().padStart(2, 0));
 
             //If coords have been updated, translate to position
-            if(p.x && p.y) {
-                $('.player[data-player='+keys[i]+']').css({
-                    "transform": "translate("+p.x+"px,"+p.y+"px)"
+            if (p.x && p.y) {
+                $('.player[data-player=' + keys[i] + ']').css({
+                    "transform": "translate(" + p.x + "px," + p.y + "px)"
                 });
             }
 
@@ -386,36 +402,332 @@ function sync() {
 
         //Bind keys to move functions
         //Only bind vertical if player 1 or 2
-        if(Player.ID == keys[0] || Player.ID == keys[1]) {
+        if (Player.ID == keys[0] || Player.ID == keys[1]) {
 
             //If key is up arrow or W
-            if(Keys[38] || Keys[87]) {
+            if (Keys[38] || Keys[87]) {
                 move("up");
             }
 
             //If key is down arrow or S
-            else if(Keys[40] || Keys[83]) {
+            else if (Keys[40] || Keys[83]) {
                 move("down");
             }
 
         }
 
         //Only bind horizontal if player 3 or 4
-        if(Player.ID == keys[2] || Player.ID == keys[3]) {
+        if (Player.ID == keys[2] || Player.ID == keys[3]) {
 
             //If key is left arrow or A
-            if(Keys[37] || Keys[65]) {
+            if (Keys[37] || Keys[65]) {
                 move("left");
             }
 
             //If key is right arrow or D
-            else if(Keys[39] || Keys[68]) {
+            else if (Keys[39] || Keys[68]) {
                 move("right");
             }
 
         }
 
+        //Host updates ball and scores
+        if (Player.ID == Game.host) {
+
+            var ball = Game.ball,
+                speed = 6;
+
+            //If ball is brand new give it a random direction
+            if (ball.sx == 0) {
+                ball.sx = randomBetween(-speed,speed);
+            }
+            if (ball.sy == 0) {
+                ball.sy = randomBetween(-speed,speed);
+
+                //Prevent bouncing on the exact corners
+                //Super annoying bug
+                while(ball.sy == ball.sx) {
+                    ball.sy = randomBetween(-speed,speed);
+                }
+            }
+
+            if (ball.x > 720) {
+
+                //Scored on purple player 2
+                if(ball.last != "purple") {
+                    score(ball.last);
+                }
+
+
+                //Reset ball
+                ball.x = 350;
+                ball.y = 350;
+                ball.last = "green";
+
+                //Send towards other player
+                ball.sy = 0;
+                ball.sx = -speed;
+
+            }
+
+            if (ball.x < -20) {
+
+                //Scored on blue player 1
+                if(ball.last != "blue") {
+                    score(ball.last);
+                }
+
+                //Reset ball
+                ball.x = 350;
+                ball.y = 350;
+                ball.last = "green";
+
+                //Send towards other player
+                ball.sy = 0;
+                ball.sx = speed;
+
+            }
+
+            var p1 = Game.players[keys[0]],
+                p2 = Game.players[keys[1]];
+
+            //Hard coding all of these values for simplicity
+            //With more time I would develop some kind of proper collison system
+
+            //If ball hits a left corner, turn around
+            if (ball.x <= 80 && (ball.y <= 78 || ball.y >= 622)) {
+                ball.sx = -ball.sx;
+                console.log("LEFT SIDE");
+            }
+
+            //If ball hits a right corner, turn around
+            if (ball.x >= 620 && (ball.y <= 78 || ball.y >= 622)) {
+                ball.sx = -ball.sx;
+                console.log("RIGHT SIDE");
+            }
+
+            //If ball hits a top corner, turn around
+            if (ball.y <= 80 && (ball.x <= 78 || ball.yx >= 622)) {
+                ball.sy = -ball.sy;
+                console.log("TOP SIDE");
+            }
+
+            //If ball hits a bottom corner, turn around
+            if (ball.y >= 620 && (ball.x <= 78 || ball.x >= 622)) {
+                ball.sy = -ball.sy;
+                console.log("BOTTOM SIDE");
+            }
+
+            if (ball.x <= 80 && ball.x >= 60 && (ball.y >= p1.y && ball.y <= (p1.y + 120))) {
+                //Hits player 1's rectangle
+                ball.sx = -ball.sx;
+                ball.last = "blue";
+
+                //Play sound effect
+                audio.blue.currentTime = 0;
+                audio.blue.play();
+            }
+
+            if (ball.x >= 620 && ball.x <= 640 && (ball.y >= p2.y && ball.y <= (p2.y + 120))) {
+                //Hits player 2's rectangle
+                ball.sx = -ball.sx;
+                ball.last = "purple";
+
+                //Play sound effect
+                audio.purple.currentTime = 0;
+                audio.purple.play();
+            }
+
+            //Goal conditions for 2 players
+            if (Game.maxplayers == 2) {
+
+                //If ball hits the top, turn it around
+                if (ball.y < 0) {
+                    ball.sy = -ball.sy;
+                }
+
+                //If ball hits the bottom, turn it around
+                if (ball.y > 700) {
+                    ball.sy = -ball.sy;
+                }
+
+            }
+
+            if (Game.maxplayers == 3) {
+
+                if (ball.y < -20) {
+
+                    //Scored on pink player 3
+                    if(ball.last != "pink") {
+                        score(ball.last);
+                    }
+
+                    //Reset ball
+                    ball.x = 350;
+                    ball.y = 350;
+                    ball.last = "green";
+
+                    //Send towards other player
+                    ball.sy = speed;
+                    ball.sx = 0;
+
+                }
+
+                var p3 = Game.players[keys[2]];
+
+
+                if (ball.y <= 80 && ball.y >= 60 && (ball.x >= p3.x && ball.x <= (p3.x + 120))) {
+                    //Hits player 3's rectangle
+                    ball.sy = -ball.sy;
+                    ball.last = "pink";
+
+                    //Play sound effect
+                    audio.pink.currentTime = 0;
+                    audio.pink.play();
+                }
+
+                //If ball hits the bottom, turn it around
+                if (ball.y > 700) {
+                    ball.sy = -ball.sy;
+                }
+
+            }
+
+            if (Game.maxplayers == 4) {
+
+                if (ball.y < -20) {
+
+                    //Scored on pink player 3
+                    if(ball.last != "pink") {
+                        score(ball.last);
+                    }
+
+                    //Reset ball
+                    ball.x = 350;
+                    ball.y = 350;
+                    ball.last = "green";
+
+                    //Send towards other player
+                    ball.sy = speed;
+                    ball.sx = 0;
+
+                }
+
+                if (ball.y > 720) {
+
+                    //Scored on orange player 4
+                    if(ball.last != "orange") {
+                        score(ball.last);
+                    }
+
+                    //Reset ball
+                    ball.x = 350;
+                    ball.y = 350;
+                    ball.last = "green";
+
+                    //Send towards other player
+                    ball.sy = speed;
+                    ball.sx = 0;
+
+                }
+
+                var p3 = Game.players[keys[2]],
+                    p4 = Game.players[keys[3]];
+
+
+                if (ball.y <= 80 && ball.y >= 60 && (ball.x >= p3.x && ball.x <= (p3.x + 120))) {
+                    //Hits player 3's rectangle
+                    ball.sy = -ball.sy;
+                    ball.last = "pink";
+
+                    //Play sound effect
+                    audio.pink.currentTime = 0;
+                    audio.pink.play();
+                }
+
+                if (ball.y >= 620 && ball.y <= 640 && (ball.x >= p4.x && ball.x <= (p4.x + 120))) {
+                    //Hits player 4's rectangle
+                    ball.sy = -ball.sy;
+                    ball.last = "orange";
+
+                    //Play sound effect
+                    audio.orange.currentTime = 0;
+                    audio.orange.play();
+                }
+
+            }
+
+            //Prevent the ball from going too fast
+            ball.sx = ball.sx.clamp(-10, 10);
+            ball.sy = ball.sy.clamp(-10, 10);
+
+            //Update ball position
+            ball.x += ball.sx;
+            ball.y += ball.sy;
+
+            server.send(JSON.stringify({
+                "type": "updateBall",
+                "lobbyID": Player.ID,
+                "ball": ball
+            }));
+
+        }
+
+        var colors = {
+            green: "#00d900",
+            blue: "#00ccff",
+            purple: "#8c00ff",
+            pink: "#ff0091",
+            orange: "#ff8c00"
+        };
+
+        //Update ball position
+        $('.ball').css({
+            "transform": "translate(" + Game.ball.x + "px," + Game.ball.y + "px)",
+            "border": "2px solid " + colors[Game.ball.last],
+            "box-shadow": "0px 0px 32px 2px " + colors[Game.ball.last] + ", inset 0px 0px 32px 2px " + colors[Game.ball.last]
+        });
+
     }
+
+}
+
+function score(color) {
+
+    audio[color].currentTime = 0;
+    audio[color].play();
+
+    //Do nothing if nobody actually scored
+    if (color != "green") {
+
+        let keys = Object.keys(Game.players),
+            colorID;
+
+        //Get player by color
+        switch (color) {
+            case "blue":
+                colorID = keys[0];
+                break;
+            case "purple":
+                colorID = keys[1];
+                break;
+            case "pink":
+                colorID = keys[2];
+                break;
+            case "orange":
+                colorID = keys[3];
+                break;
+        }
+
+        //Let the server know about the score
+        server.send(JSON.stringify({
+            type: "score",
+            lobbyID: Player.lobby,
+            playerID: colorID
+        }));
+
+    }
+
 
 }
 
@@ -432,29 +744,29 @@ function move(d) {
 
     //Refer to player as p
     var p = Game.players[Player.ID],
-    //Amount moved per tick
+        //Amount moved per tick
         a = 4;
 
     //Client side movement to help reduce visual lag
-    switch(d) {
+    switch (d) {
         case "up":
-            p.y-= a;
+            p.y -= a;
             break;
         case "down":
-            p.y+= a;
+            p.y += a;
             break;
         case "left":
-            p.x-= a;
+            p.x -= a;
             break;
         case "right":
-            p.x+= a;
+            p.x += a;
             break;
     }
 
     //Actually move the element, more efficient with a translate
     //Position gets overridden later by sync
-    $('.player[data-player='+Player.ID+']').css({
-        "transform": "translate("+p.x+"px,"+p.y+"px)"
+    $('.player[data-player=' + Player.ID + ']').css({
+        "transform": "translate(" + p.x + "px," + p.y + "px)"
     });
 
 }
@@ -543,7 +855,7 @@ function createLobby() {
 function startGame() {
 
     //Only start if all players are present
-    if(Game.current == Game.maxplayers) {
+    if (Game.current == Game.maxplayers) {
 
         let msg = {
             type: "startGame",
@@ -564,6 +876,16 @@ function quit() {
     server.close();
 
 }
+
+//Random number between
+function randomBetween(min,max) {
+    return Math.floor(Math.random()*(max-min+1)+min);
+}
+
+//Keep a number within a specified range
+Number.prototype.clamp = function(min, max) {
+    return Math.min(Math.max(this, min), max);
+};
 
 // Runs initialize when the page loads
 window.onload = initialize;

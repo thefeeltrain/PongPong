@@ -359,7 +359,7 @@ h2 {
 }
 
 .player.purple {
-    transform: translate(660px,300px);
+    transform: translate(640px,300px);
     width: 20px;
     height: 120px;
     border: 2px solid #8c00ff;
@@ -367,7 +367,7 @@ h2 {
 }
 
 .player.orange {
-    transform: translate(300px,660px);
+    transform: translate(300px,640px);
     width: 120px;
     height: 20px;
     border: 2px solid #ff8c00;
@@ -378,8 +378,9 @@ h2 {
     position: absolute;
     width: 20px;
     height: 20px;
-    left: 370px;
-    top: 370px;
+    left: 0;
+    top: 0;
+    transform: translate(350px,350px);
     border: 2px solid #00d900;
     box-shadow: 0px 0px 32px 2px rgba(0,217,0,1), inset 0px 0px 32px 2px rgba(0,217,0,1);
     border-radius: 100%;
