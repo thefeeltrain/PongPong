@@ -113,6 +113,7 @@ function initialize() {
 
         else if(msg.type == "chat") {
             $('.chat-content').append("<div class=\"chat-message\">"+msg.sender+": "+msg.message+"</div>");
+            $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight);
         }
 
         //When the user successfully joins a lobby
