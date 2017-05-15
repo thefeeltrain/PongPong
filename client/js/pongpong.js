@@ -377,6 +377,13 @@ function sync() {
 
             }
 
+            //Meme machine
+            if(Game.linusmode == 1) {
+                $('.ball').addClass('linus');
+            } else {
+                $('.ball').removeClass('linus');
+            }
+
         }
 
         //Done for each player in the game
@@ -390,6 +397,45 @@ function sync() {
 
             //padStart adds a zero to the front if score is one digit
             $('.score[data-player=' + keys[i] + '] .points').text(p.score.toString().padStart(2, 0));
+
+            if(typeof p.x == "undefined") {
+
+                //If player 1 set X coord to 60
+                if(i == 0) {
+                    p.x = 60;
+                }
+
+                //If player 2 set X coord to 640
+                if(i == 1) {
+                    p.x = 640;
+                }
+
+                //If player 3 or 4 set X coord to 300
+                if(i == 2 || i == 3) {
+                    p.x = 300;
+                }
+
+            }
+
+            //If Y coord has not been set yet
+            if(typeof p.y == "undefined") {
+
+                //If player 1 or 2 set Y coord to 300
+                if(i == 0 || i == 1) {
+                    p.y = 300;
+                }
+
+                //If player 3 set Y coord to 60
+                if(i == 2) {
+                    p.y = 60;
+                }
+
+                //If player 4 set Y coord to 640
+                if(i == 3) {
+                    p.y = 640;
+                }
+
+            }
 
             //If coords have been updated, translate to position
             if (p.x && p.y) {
@@ -464,7 +510,7 @@ function sync() {
                 ball.y = 350;
                 ball.last = "green";
 
-                //Send towards other player
+                //Send towards opposite player
                 ball.sy = 0;
                 ball.sx = -speed;
 
@@ -482,7 +528,7 @@ function sync() {
                 ball.y = 350;
                 ball.last = "green";
 
-                //Send towards other player
+                //Send towards opposite player
                 ball.sy = 0;
                 ball.sx = speed;
 
@@ -507,7 +553,7 @@ function sync() {
             }
 
             //If ball hits a top corner, turn around
-            if (ball.y <= 80 && (ball.x <= 78 || ball.yx >= 622)) {
+            if (ball.y <= 80 && (ball.x <= 78 || ball.x >= 622)) {
                 ball.sy = -ball.sy;
                 console.log("TOP SIDE");
             }
@@ -518,7 +564,7 @@ function sync() {
                 console.log("BOTTOM SIDE");
             }
 
-            if (ball.x <= 80 && ball.x >= 60 && (ball.y >= p1.y && ball.y <= (p1.y + 120))) {
+            if (ball.x <= 80 && ball.x >= 60 && (ball.y >= p1.y-20 && ball.y <= (p1.y + 120))) {
                 //Hits player 1's rectangle
                 ball.sx = -ball.sx;
                 ball.last = "blue";
@@ -528,7 +574,7 @@ function sync() {
                 audio.blue.play();
             }
 
-            if (ball.x >= 620 && ball.x <= 640 && (ball.y >= p2.y && ball.y <= (p2.y + 120))) {
+            if (ball.x >= 620 && ball.x <= 640 && (ball.y >= p2.y-20 && ball.y <= (p2.y + 120))) {
                 //Hits player 2's rectangle
                 ball.sx = -ball.sx;
                 ball.last = "purple";
@@ -576,7 +622,7 @@ function sync() {
                 var p3 = Game.players[keys[2]];
 
 
-                if (ball.y <= 80 && ball.y >= 60 && (ball.x >= p3.x && ball.x <= (p3.x + 120))) {
+                if (ball.y <= 80 && ball.y >= 60 && (ball.x >= p3.x-20 && ball.x <= (p3.x + 100))) {
                     //Hits player 3's rectangle
                     ball.sy = -ball.sy;
                     ball.last = "pink";
@@ -607,7 +653,7 @@ function sync() {
                     ball.y = 350;
                     ball.last = "green";
 
-                    //Send towards other player
+                    //Send towards opposite player
                     ball.sy = speed;
                     ball.sx = 0;
 
@@ -625,8 +671,8 @@ function sync() {
                     ball.y = 350;
                     ball.last = "green";
 
-                    //Send towards other player
-                    ball.sy = speed;
+                    //Send towards opposite player
+                    ball.sy = -speed;
                     ball.sx = 0;
 
                 }
@@ -635,7 +681,7 @@ function sync() {
                     p4 = Game.players[keys[3]];
 
 
-                if (ball.y <= 80 && ball.y >= 60 && (ball.x >= p3.x && ball.x <= (p3.x + 120))) {
+                if (ball.y <= 80 && ball.y >= 60 && (ball.x >= p3.x-20 && ball.x <= (p3.x + 100))) {
                     //Hits player 3's rectangle
                     ball.sy = -ball.sy;
                     ball.last = "pink";
@@ -645,7 +691,7 @@ function sync() {
                     audio.pink.play();
                 }
 
-                if (ball.y >= 620 && ball.y <= 640 && (ball.x >= p4.x && ball.x <= (p4.x + 120))) {
+                if (ball.y >= 620 && ball.y <= 640 && (ball.x >= p4.x-20 && ball.x <= (p4.x + 100))) {
                     //Hits player 4's rectangle
                     ball.sy = -ball.sy;
                     ball.last = "orange";
@@ -681,12 +727,26 @@ function sync() {
             orange: "#ff8c00"
         };
 
-        //Update ball position
-        $('.ball').css({
-            "transform": "translate(" + Game.ball.x + "px," + Game.ball.y + "px)",
-            "border": "2px solid " + colors[Game.ball.last],
-            "box-shadow": "0px 0px 32px 2px " + colors[Game.ball.last] + ", inset 0px 0px 32px 2px " + colors[Game.ball.last]
-        });
+
+        if(Game.linusmode == 1) {
+
+            //Just memes
+            $('.ball').css({
+                "transform": "translate(" + Game.ball.x + "px," + Game.ball.y + "px) scale(3)",
+                "border": 0,
+                "box-shadow": "none"
+            });
+
+        } else {
+
+            //Update ball position
+            $('.ball').css({
+                "transform": "translate(" + Game.ball.x + "px," + Game.ball.y + "px)",
+                "border": "2px solid " + colors[Game.ball.last],
+                "box-shadow": "0px 0px 32px 2px " + colors[Game.ball.last] + ", inset 0px 0px 32px 2px " + colors[Game.ball.last]
+            });
+
+        }
 
     }
 
