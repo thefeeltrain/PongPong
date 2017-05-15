@@ -64,6 +64,15 @@ function initialize() {
         Keys[e.keyCode] = true;
     }
 
+    $('.chat-input').keypress(function (e) {
+
+        if (e.which == 13) {
+            sendMessage($(this).val());
+            $(this).val("");
+        }
+
+    });
+
     //Show stat(s)
     //I plan on adding more stats in the future
     //This one is just proof of concept
@@ -100,6 +109,10 @@ function initialize() {
             //Show game code in lobby screen
             $('.game-code').text(msg.id);
 
+        }
+
+        else if(msg.type == "chat") {
+            $('.chat-content').append("<div class=\"chat-message\">"+msg.sender+": "+msg.message+"</div>");
         }
 
         //When the user successfully joins a lobby
@@ -1030,10 +1043,19 @@ function endGame(w) {
 
     server.send(JSON.stringify({
         type: "endGame",
-        lobbyID: Player.ID,
+        lobbyID: Player.lobby,
         winner: w
     }));
 
+}
+
+function sendMessage(m) {
+    server.send(JSON.stringify({
+        type: "message",
+        lobbyID: Player.lobby,
+        sender: Player.name,
+        message: m
+    }));
 }
 
 function quit() {
