@@ -1,3 +1,6 @@
+//Which server to connect to
+let SERVER = "127.0.0.1:8082";
+
 var server,
 
     //Audio handler, keeps audio objects together
@@ -19,7 +22,7 @@ var server,
             maxplayers: 4,
             visibility: 1,
             linusmode: 0,
-            scoretowin: 10
+            scoretowin: 15
         },
         players: {}
     },
@@ -58,7 +61,7 @@ function initialize() {
     }
 
     //Connect to server, temp use localhost
-    server = new WebSocket("ws://localhost:8082");
+    server = new WebSocket("ws://"+SERVER);
 
     //Let user know if socket cannot connect
     server.onerror = function() {
@@ -152,6 +155,21 @@ function initialize() {
                 audio.click.play();
 
             });
+
+        }
+
+        else if(msg.type == "score") {
+
+            //If player has been scored on, add it up
+            if(msg.playerID == Player.ID) {
+                Player.scores++;
+                //Save in localStorage so it can be retrieved later
+                //Ideally this would be in a database
+                localStorage.setItem("totalScores",Player.scores);
+            }
+
+            audio[msg.color].currentTime = 0;
+            audio[msg.color].play();
 
         }
 
@@ -337,6 +355,20 @@ function sync() {
             Player.view = "tabletop";
         }
 
+
+        for(var p in Game.players) {
+
+            //If one of the players reaches the target score
+            if(Game.players[p].score == Game.scoretowin) {
+
+                //End the game
+                endGame(Game.players[p].name);
+                Game.status = "ended";
+
+            }
+
+        }
+
         //Runs the first loop
         if (!Player.started) {
 
@@ -495,13 +527,14 @@ function sync() {
                 while(ball.sy == ball.sx) {
                     ball.sy = randomBetween(-speed,speed);
                 }
+
             }
 
             if (ball.x > 720) {
 
                 //Scored on purple player 2
                 if(ball.last != "purple") {
-                    score(ball.last);
+                    score(ball.last,"purple");
                 }
 
 
@@ -520,7 +553,7 @@ function sync() {
 
                 //Scored on blue player 1
                 if(ball.last != "blue") {
-                    score(ball.last);
+                    score(ball.last,"blue");
                 }
 
                 //Reset ball
@@ -543,31 +576,30 @@ function sync() {
             //If ball hits a left corner, turn around
             if (ball.x <= 80 && (ball.y <= 78 || ball.y >= 622)) {
                 ball.sx = -ball.sx;
-                console.log("LEFT SIDE");
             }
 
             //If ball hits a right corner, turn around
             if (ball.x >= 620 && (ball.y <= 78 || ball.y >= 622)) {
                 ball.sx = -ball.sx;
-                console.log("RIGHT SIDE");
             }
 
             //If ball hits a top corner, turn around
             if (ball.y <= 80 && (ball.x <= 78 || ball.x >= 622)) {
                 ball.sy = -ball.sy;
-                console.log("TOP SIDE");
             }
 
             //If ball hits a bottom corner, turn around
             if (ball.y >= 620 && (ball.x <= 78 || ball.x >= 622)) {
                 ball.sy = -ball.sy;
-                console.log("BOTTOM SIDE");
             }
 
             if (ball.x <= 80 && ball.x >= 60 && (ball.y >= p1.y-20 && ball.y <= (p1.y + 120))) {
                 //Hits player 1's rectangle
                 ball.sx = -ball.sx;
                 ball.last = "blue";
+
+                //For stat collection
+                countHit("blue");
 
                 //Play sound effect
                 audio.blue.currentTime = 0;
@@ -578,6 +610,9 @@ function sync() {
                 //Hits player 2's rectangle
                 ball.sx = -ball.sx;
                 ball.last = "purple";
+
+                //For stat collection
+                countHit("purple");
 
                 //Play sound effect
                 audio.purple.currentTime = 0;
@@ -605,7 +640,7 @@ function sync() {
 
                     //Scored on pink player 3
                     if(ball.last != "pink") {
-                        score(ball.last);
+                        score(ball.last,"pink");
                     }
 
                     //Reset ball
@@ -627,6 +662,9 @@ function sync() {
                     ball.sy = -ball.sy;
                     ball.last = "pink";
 
+                    //For stat collection
+                    countHit("pink");
+
                     //Play sound effect
                     audio.pink.currentTime = 0;
                     audio.pink.play();
@@ -645,7 +683,7 @@ function sync() {
 
                     //Scored on pink player 3
                     if(ball.last != "pink") {
-                        score(ball.last);
+                        score(ball.last,"pink");
                     }
 
                     //Reset ball
@@ -663,7 +701,7 @@ function sync() {
 
                     //Scored on orange player 4
                     if(ball.last != "orange") {
-                        score(ball.last);
+                        score(ball.last,"orange");
                     }
 
                     //Reset ball
@@ -686,6 +724,9 @@ function sync() {
                     ball.sy = -ball.sy;
                     ball.last = "pink";
 
+                    //For stat collection
+                    countHit("pink");
+
                     //Play sound effect
                     audio.pink.currentTime = 0;
                     audio.pink.play();
@@ -695,6 +736,9 @@ function sync() {
                     //Hits player 4's rectangle
                     ball.sy = -ball.sy;
                     ball.last = "orange";
+
+                    //For stat collection
+                    countHit("orange");
 
                     //Play sound effect
                     audio.orange.currentTime = 0;
@@ -719,6 +763,7 @@ function sync() {
 
         }
 
+        //Easy color access
         var colors = {
             green: "#00d900",
             blue: "#00ccff",
@@ -728,9 +773,11 @@ function sync() {
         };
 
 
+        //Check for Linus mode
         if(Game.linusmode == 1) {
 
             //Just memes
+            //Removes the border and shadow from the ball
             $('.ball').css({
                 "transform": "translate(" + Game.ball.x + "px," + Game.ball.y + "px) scale(3)",
                 "border": 0,
@@ -739,7 +786,7 @@ function sync() {
 
         } else {
 
-            //Update ball position
+            //Update ball position normally
             $('.ball').css({
                 "transform": "translate(" + Game.ball.x + "px," + Game.ball.y + "px)",
                 "border": "2px solid " + colors[Game.ball.last],
@@ -750,9 +797,23 @@ function sync() {
 
     }
 
+    if(Game.status == "ended") {
+
+        //Show winner's name
+        $('.winner span').text(Game.winner+'!');
+
+        //Make sure player is on the post-game screen
+        if (Player.view != "post-game") {
+            $('.showing').removeClass('showing');
+            $('.post-game').addClass('showing');
+            Player.view = "post-game";
+        }
+
+    }
+
 }
 
-function score(color) {
+function score(color,on) {
 
     audio[color].currentTime = 0;
     audio[color].play();
@@ -764,31 +825,49 @@ function score(color) {
             colorID;
 
         //Get player by color
-        switch (color) {
-            case "blue":
-                colorID = keys[0];
-                break;
-            case "purple":
-                colorID = keys[1];
-                break;
-            case "pink":
-                colorID = keys[2];
-                break;
-            case "orange":
-                colorID = keys[3];
-                break;
-        }
+        colorID = playerFromColor(color);
 
         //Let the server know about the score
         server.send(JSON.stringify({
-            type: "score",
-            lobbyID: Player.lobby,
-            playerID: colorID
+            "type": "score",
+            "lobbyID": Player.lobby,
+            "playerID": colorID,
+            "color": color
+        }));
+
+    } else {
+
+        //Send green for sound effect only
+        server.send(JSON.stringify({
+            "type": "score",
+            "lobbyID": Player.lobby,
+            "color": "green"
         }));
 
     }
 
 
+}
+
+//Gets the player's ID from their color
+function playerFromColor(c) {
+    var colorID,
+        keys = Object.keys(Game.players);
+    switch (c) {
+        case "blue":
+            colorID = keys[0];
+            break;
+        case "purple":
+            colorID = keys[1];
+            break;
+        case "pink":
+            colorID = keys[2];
+            break;
+        case "orange":
+            colorID = keys[3];
+            break;
+    }
+    return colorID;
 }
 
 function move(d) {
@@ -927,6 +1006,22 @@ function startGame() {
         server.send(JSON.stringify(msg));
 
     }
+
+}
+
+function countHit(c) {
+
+    //Stat collection here
+
+}
+
+function endGame(w) {
+
+    server.send(JSON.stringify({
+        type: "endGame",
+        lobbyID: Player.ID,
+        winner: w
+    }));
 
 }
 

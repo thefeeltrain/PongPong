@@ -1,3 +1,7 @@
+
+//Port for the server to run on
+let PORT = 8082;
+
 //Initialize players and lobbies
 var players = {},
     lobbies = {},
@@ -26,6 +30,8 @@ var ws = require("nodejs-websocket"),
                 //Connect name to ID and create the player object
                 players[msg.id] = {
                     name: data.name,
+                    //Save connection for later
+                    connection: conn
                 };
 
                 //Player disconnects
@@ -228,8 +234,27 @@ var ws = require("nodejs-websocket"),
 
             else if(data.type == "score") {
 
-                //Add one point to player's score
-                lobbies[data.lobbyID].players[data.playerID].score++;
+                var keys = Object.keys(lobbies[data.lobbyID].players),
+                    m = {
+                        "type": "score",
+                        "color": data.color
+                    };
+
+                //Color is green if no one actually touched the ball
+                //Does not count
+                if(data.color != "green") {
+                    //Add one point to player's score
+                    lobbies[data.lobbyID].players[data.playerID].score++;
+                    m.playerID = data.playerID;
+                }
+
+                //For each client
+                for(var i=0; i < keys.length; i++) {
+
+                    //Send score event to clients in server
+                    players[keys[i]].connection.sendText(JSON.stringify(m));
+
+                }
 
             }
 
@@ -298,6 +323,21 @@ var ws = require("nodejs-websocket"),
 
             }
 
+            else if(data.type == "endGame") {
+
+                //Fix strange bug that causes server to crash when a game ends
+                if(typeof lobbies[data.lobbyID] != "undefined") {
+
+                    //Mark the game as ended
+                    lobbies[data.lobbyID].status = "ended";
+
+                    //Show winner
+                    lobbies[data.lobbyID].winner = data.winner;
+
+                }
+
+            }
+
             //Send the generated message if it exists
             if (msg) {
                 conn.sendText(JSON.stringify(msg));
@@ -305,7 +345,7 @@ var ws = require("nodejs-websocket"),
 
         })
 
-    }).listen(8082);
+    }).listen(PORT);
 
 function loop() {
     //Reset console and output various metrics
@@ -313,8 +353,6 @@ function loop() {
     console.log("PongPong Server\n");
     console.log("# of Players: " + Object.keys(players).length);
     console.log("# of Lobbies: " + Object.keys(lobbies).length + "\n");
-
-    console.log(JSON.stringify(players));
 
     console.log("List of Lobbies:");
     console.log("Host\t\tPlayers\t\tStatus");

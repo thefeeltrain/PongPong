@@ -45,10 +45,10 @@
                 <div class="setting" data-setting="scoretowin">
                     <span class="label">Score to Win</span>
                     <ul>
-                        <li data-value=5>5</li>
-                        <li data-value=10 class="selected">10</li>
-                        <li data-value=15>15</li>
+                        <li data-value=10>10</li>
+                        <li data-value=15 class="selected">15</li>
                         <li data-value=20>20</li>
+                        <li data-value=25>25</li>
                     </ul>
                 </div>
 
@@ -188,7 +188,16 @@
 
         </div>
 
-        <div class="view post-game"></div>
+        <!-- Shown after a game has finished !-->
+        <div class="view post-game">
+
+            <!-- Display winner's name in large text !-->
+            <div class="winner">The winner is...<span>New001!</span></div>
+
+            <!-- Back to main menu !-->
+            <span class="back" data-view="main-menu" data-action="leave-lobby">Leave</span>
+
+        </div>
 
     </div>
 
