@@ -8,6 +8,10 @@
     /* Disable font anti-aliasing for pixel type */
     font-smooth: never;
     -webkit-font-smoothing : none;
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+    user-select: none;
 }
 
 @font-face {
@@ -80,6 +84,14 @@
     background: -webkit-linear-gradient(top, rgba(255,199,0,1) 0%,rgba(246,69,133,1) 100%);
     background: linear-gradient(to bottom, rgba(255,199,0,1) 0%,rgba(246,69,133,1) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffc700', endColorstr='#f64585',GradientType=0 );
+}
+
+.view.my-stats {
+    background: rgb(176,50,255);
+    background: -moz-linear-gradient(top, rgba(176,50,255,1) 0%, rgba(255,140,0,1) 100%);
+    background: -webkit-linear-gradient(top, rgba(176,50,255,1) 0%,rgba(255,140,0,1) 100%);
+    background: linear-gradient(to bottom, rgba(176,50,255,1) 0%,rgba(255,140,0,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b032ff', endColorstr='#ff8c00',GradientType=0 );
 }
 
 h1 {

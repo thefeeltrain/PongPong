@@ -1,5 +1,5 @@
 //Which server to connect to
-let SERVER = "127.0.0.1:8082";
+let SERVER = "thefeeltra.in:8082";
 
 var server,
 
@@ -40,7 +40,11 @@ var server,
         "view": "main-menu",
 
         //If the player has started the game
-        "started": false
+        "started": false,
+
+        //Total number of points the player has made
+        //Pulled from localStorage to save time
+        "scores": localStorage.getItem("totalScores") || 0
 
     },
 
@@ -59,6 +63,11 @@ function initialize() {
     window.onkeydown = function(e) {
         Keys[e.keyCode] = true;
     }
+
+    //Show stat(s)
+    //I plan on adding more stats in the future
+    //This one is just proof of concept
+    $('[data-stat="totalScores"]').text(Player.scores);
 
     //Connect to server, temp use localhost
     server = new WebSocket("ws://"+SERVER);
@@ -166,6 +175,7 @@ function initialize() {
                 //Save in localStorage so it can be retrieved later
                 //Ideally this would be in a database
                 localStorage.setItem("totalScores",Player.scores);
+                $('[data-stat="totalScores"]').text(Player.scores);
             }
 
             audio[msg.color].currentTime = 0;

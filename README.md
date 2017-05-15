@@ -10,7 +10,7 @@ Built for FloatPlane Club in HTML, CSS, JavaScript, and NodeJS from scratch in a
 
 A version of the game can be played at http://pongpong.thefeeltra.in.
 
-Be aware it is hosted in San Francisco so distance may cause lag and ping related issues.
+<b>Be aware it is hosted in San Francisco so distance may cause lag and ping related issues.</b>
 
 &nbsp;
 
@@ -21,7 +21,7 @@ Be aware it is hosted in San Francisco so distance may cause lag and ping relate
 - ~Lobby chat~ Cut due to time constraints
 - Server browser
 - Player stats
-- Settings
+- ~Settings~ Cut due to time constraints
 
 &nbsp;
 
