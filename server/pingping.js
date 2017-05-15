@@ -65,7 +65,8 @@ var ws = require("nodejs-websocket"),
 
                     var msg = {
                         "type": "sync",
-                        "Game": lobbies[data.lobbyID]
+                        "Game": lobbies[data.lobbyID],
+                        "ping": (new Date().getTime() - data.time)
                     }
 
                 }

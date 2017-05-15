@@ -316,7 +316,8 @@ function loop() {
         let msg = {
             type: "sync",
             id: Player.ID,
-            lobbyID: Player.lobby
+            lobbyID: Player.lobby,
+            time: new Date().getTime()
         };
         server.send(JSON.stringify(msg));
     }
