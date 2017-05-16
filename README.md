@@ -25,6 +25,27 @@ A version of the game can be played at http://pongpong.thefeeltra.in.
 
 &nbsp;
 
+## Known Bugs
+
+- Ball gets stuck in loop when bouncing off the exact corners
+- Non-host players do not have a sound when the ball hits a paddle
+- The chat box does not get cleared when joining or creating a new lobby
+- Create game menu does not update visually when the Game object resets
+- Ball travels through center of paddle at certain angles
+- Ball physics are completely wrong
+- There is no continue button after a game ends
+
+
+- <b>Windows Only</b> - The scrollbar takes up space in the server browser causing the element to render improperly
+
+Linux (How it's supposed to look): <img src="https://i.gyazo.com/dc0b09e612b05748dbf4ddd726794a68.png">
+
+Windows: <img src="https://i.gyazo.com/de48ba896f0b3a3c04e459720dffce35.png">
+
+
+
+&nbsp;
+
 ## Running Your Own Server
 
 By default, the game connects to my test server here in California. This may cause some lag/ping related issues. In an ideal situation there would be dedicated servers for different regions.
